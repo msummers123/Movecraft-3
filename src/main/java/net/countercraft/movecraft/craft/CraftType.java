@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.List;
+import org.bukkit.Material;
 
 public class CraftType {
 	private String craftName;
