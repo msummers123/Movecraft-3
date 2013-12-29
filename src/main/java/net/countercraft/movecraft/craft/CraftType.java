@@ -34,14 +34,14 @@ public class CraftType {
 	private String craftName;
 	private int maxSize, minSize, minHeightLimit, maxHeightLimit;
 	private Integer[] allowedBlocks, forbiddenBlocks;
-	private boolean canFly, tryNudge, canCruise, canTeleport, canStaticMove;
+	private boolean canFly, tryNudge, canCruise, canTeleport, canStaticMove,canHover,useGravity;
 	private int cruiseSkipBlocks;
 	private double fuelBurnRate;
 	private double sinkPercent;
 	private float collisionExplosion;
 	private int tickCooldown;
 	private HashMap<Integer, ArrayList<Double>> flyBlocks = new HashMap<Integer, ArrayList<Double>>();
-		private int hoverLimit;
+	private int hoverLimit;
 	private List<Material> harvestBlocks;
 
 	public CraftType( File f ) {
