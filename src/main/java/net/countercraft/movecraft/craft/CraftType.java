@@ -108,7 +108,6 @@ public class CraftType {
 	        }else{
 	            minHeightLimit=0;
 	        }
-	        //maxHeightLimit is corrected by world in Craft.translate
 	        if (data.containsKey("maxHeightLimit")){
 	            maxHeightLimit = ( Integer ) data.get( "maxHeightLimit" );
 	            if (maxHeightLimit<=minHeightLimit){maxHeightLimit=254;} 
