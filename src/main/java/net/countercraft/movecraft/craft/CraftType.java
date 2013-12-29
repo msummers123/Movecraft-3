@@ -41,6 +41,8 @@ public class CraftType {
 	private float collisionExplosion;
 	private int tickCooldown;
 	private HashMap<Integer, ArrayList<Double>> flyBlocks = new HashMap<Integer, ArrayList<Double>>();
+		private int hoverLimit;
+	private List<Material> harvestBlocks;
 
 	public CraftType( File f ) {
 		try {
@@ -100,19 +102,48 @@ public class CraftType {
 		} else {
 			collisionExplosion=0.0F;
 		}
-        if (data.containsKey("minHeightLimit")){
-            minHeightLimit = ( Integer ) data.get( "minHeightLimit" );
-            if (minHeightLimit<0){minHeightLimit=0;}
-        }else{
-            minHeightLimit=0;
-        }
-        //maxHeightLimit is corrected by world in Craft.translate
-        if (data.containsKey("maxHeightLimit")){
-            maxHeightLimit = ( Integer ) data.get( "maxHeightLimit" );
-            if (maxHeightLimit<=minHeightLimit){maxHeightLimit=254;} 
-        }else{
-            maxHeightLimit=254; 
-        }
+	        if (data.containsKey("minHeightLimit")){
+	            minHeightLimit = ( Integer ) data.get( "minHeightLimit" );
+	            if (minHeightLimit<0){minHeightLimit=0;}
+	        }else{
+	            minHeightLimit=0;
+	        }
+	        //maxHeightLimit is corrected by world in Craft.translate
+	        if (data.containsKey("maxHeightLimit")){
+	            maxHeightLimit = ( Integer ) data.get( "maxHeightLimit" );
+	            if (maxHeightLimit<=minHeightLimit){maxHeightLimit=254;} 
+	        }else{
+	            maxHeightLimit=254; 
+	        }
+	        if(data.containsKey("canHover")) {
+			canHover=(Boolean) data.get("canHover");
+		} else {
+			canHover=false;
+		}
+		if(data.containsKey("useGravity")) {
+			useGravity=(Boolean) data.get("useGravity");
+        	} else {
+			useGravity=false;
+		}
+		if (data.containsKey("hoverLimit")){
+			hoverLimit = ( Integer ) data.get( "hoverLimit" );
+			if (hoverLimit<0){
+				hoverLimit=0;
+			}
+		}else{
+			hoverLimit=0;
+		}
+		harvestBlocks = new ArrayList<Material>(); 
+	        if (data.containsKey("harvestBlocks")){
+			String[] temp = ((ArrayList<String> ) data.get( "harvestBlocks" )).toArray( new String[1] );
+			for (int i = 0; i < temp.length; i++){
+				Material mat = Material.getMaterial(temp[i]);
+				if (mat != null ){
+					harvestBlocks.add(mat);
+				}
+			}
+	        }	
+		
 	}
 
 	public String getCraftName() {
@@ -185,4 +216,19 @@ public class CraftType {
         public int getMinHeightLimit(){
                 return minHeightLimit;
         }
+        public boolean getCanHover(){
+		return canHover;
+	}
+	
+	public int getHoverLimit(){
+		return hoverLimit;
+	}
+	
+	public List<Material> getHarvestBlocks() {
+		return harvestBlocks;
+	}
+	
+	public boolean getUseGravity(){
+		return useGravity;
+	}
 }
