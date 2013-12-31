@@ -326,7 +326,7 @@ public class TranslationTask extends AsyncTask {
                         if (hoverOver==0){
                             //we go directly forward so we check if we can go down
                             for (int ii = -1 ;ii > - hoverLimit - 2- (canHoverOverWater?0:1) ; ii--){
-                                if (!isFreeSpace(data.getDx(),hoverOver+ii, data.getDz(), blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater)){
+                                if (!isFreeSpace(data.getDx(),hoverOver+ii, data.getDz(), blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater && checkHover)){
                                     break;
                                 }
                                 iFreeSpace ++;
@@ -341,7 +341,7 @@ public class TranslationTask extends AsyncTask {
                         }else if (hoverOver == 1 && !airCraft){
                             //prevent fly heigher than hoverLimit
                             for (int ii = -1 ;ii > - hoverLimit - 2; ii--){
-                                if (!isFreeSpace(data.getDx(),hoverOver+ii, data.getDz(), blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater)){
+                                if (!isFreeSpace(data.getDx(),hoverOver+ii, data.getDz(), blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater && checkHover)){
                                     break;
                                 }
                                 iFreeSpace ++;
@@ -354,7 +354,7 @@ public class TranslationTask extends AsyncTask {
                         }else if(hoverOver > 1){
                             //prevent jump thru block  
                             for (int ii = 1 ;ii < hoverOver - 1; ii++){
-                                    if (!isFreeSpace(0,ii, 0, blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater)){
+                                    if (!isFreeSpace(0,ii, 0, blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater && checkHover)){
                                         break;
                                     }
                                     iFreeSpace ++;
@@ -368,7 +368,7 @@ public class TranslationTask extends AsyncTask {
                         }else if(hoverOver < -1){
                             //prevent jump thru block  
                             for (int ii = -1 ;ii > hoverOver + 1; ii--){
-                                    if (!isFreeSpace(0,ii, 0, blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater)){
+                                    if (!isFreeSpace(0,ii, 0, blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater && checkHover)){
                                         break;
                                     }
                                     iFreeSpace ++;
@@ -385,7 +385,7 @@ public class TranslationTask extends AsyncTask {
                             if (hoverOver >=1){
                                 //others hoverOver values we have checked jet
                                 for (int ii = hoverOver-1 ;ii >hoverOver - hoverLimit - 2; ii--){
-                                    if (!isFreeSpace(0,ii, 0, blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater)){
+                                    if (!isFreeSpace(0,ii, 0, blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater && checkHover)){
                                         break;
                                     }
                                     iFreeSpace ++;
@@ -520,8 +520,8 @@ public class TranslationTask extends AsyncTask {
 
             Material testMaterial = getCraft().getW().getBlockAt( newLoc.getX(), newLoc.getY(), newLoc.getZ() ).getType();
             if (!canHoverOverWater){
-                if ( testMaterial == Material.STATIONARY_WATER || testMaterial == Material.WATER ){
-                    fail (String.format("Tento stroj se nemĹŻĹže pohybovat nad vodnĂ­ hladinou!"));
+                if ( testMaterial == Material.STATIONARY_WATER || testMaterial == Material.WATER ){                    
+                    fail (String.format(I18nSupport.getInternationalisedString( "Translation - Failed Craft over water" )));
                 }
             }
             
