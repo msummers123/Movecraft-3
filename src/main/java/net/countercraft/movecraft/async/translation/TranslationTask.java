@@ -242,11 +242,11 @@ public class TranslationTask extends AsyncTask {
            
 			if(!waterCraft) {
 				// New block is not air or a piston head and is not part of the existing ship
-				blockObstructed = (testMaterial != Material.AIR && testMaterial != Material.PISTON_EXTENSION) && !existingBlockSet.contains( newLoc );
+				blockObstructed = (!testMaterial.equals(Material.AIR) && !testMaterial.equals(Material.PISTON_EXTENSION)) && !existingBlockSet.contains( newLoc );
 			} else {
 				// New block is not air or water or a piston head and is not part of the existing ship
-				blockObstructed = (testMaterial != Material.AIR && testMaterial != Material.STATIONARY_WATER 
-                                && testMaterial != Material.WATER && testMaterial != Material.PISTON_EXTENSION) && !existingBlockSet.contains( newLoc );
+				blockObstructed = (!testMaterial.equals(Material.AIR) && !testMaterial.equals(Material.STATIONARY_WATER) 
+                                && !testMaterial.equals(Material.WATER) && !testMaterial.equals(Material.PISTON_EXTENSION)) && !existingBlockSet.contains( newLoc );
 			}
             if (blockObstructed && hoverCraft){
                 // New block is not harvested block
@@ -318,8 +318,10 @@ public class TranslationTask extends AsyncTask {
 				int oldID = getCraft().getW().getBlockTypeIdAt( oldLoc.getX(), oldLoc.getY(), oldLoc.getZ() );
 				updateSet.add( new MapUpdateCommand( oldLoc, newLoc, oldID, getCraft() ) );
 				tempBlockList.add(newLoc);
+                
                 if ( i == blocksList.length - 1 ){
-                    if (hoverCraft && hoverUseGravity){
+                    if ((hoverCraft && hoverUseGravity) || (hoverUseGravity && newLoc.getY() > data.getMaxHeight() &&  hoverOver ==0) ){
+                        //hovecraft using gravity or something else using gravity and flying over its limit
                         int iFreeSpace = 0;
                         //canHoverOverWater adds 1 to dY for better check water under craft 
                         // best way should be expand selected region to each first blocks under craft
@@ -520,7 +522,7 @@ public class TranslationTask extends AsyncTask {
 
             Material testMaterial = getCraft().getW().getBlockAt( newLoc.getX(), newLoc.getY(), newLoc.getZ() ).getType();
             if (!canHoverOverWater){
-                if ( testMaterial == Material.STATIONARY_WATER || testMaterial == Material.WATER ){                    
+                if ( testMaterial.equals(Material.STATIONARY_WATER) || testMaterial.equals(Material.WATER) ){                    
                     fail (String.format(I18nSupport.getInternationalisedString( "Translation - Failed Craft over water" )));
                 }
             }
@@ -536,11 +538,11 @@ public class TranslationTask extends AsyncTask {
             boolean blockObstructed=false;
             if(!waterCraft) {
 				// New block is not air or a piston head and is not part of the existing ship
-				blockObstructed = (testMaterial != Material.AIR && testMaterial != Material.PISTON_EXTENSION) && !existingBlockSet.contains( newLoc );
+				blockObstructed = (!testMaterial.equals(Material.AIR) && !testMaterial.equals(Material.PISTON_EXTENSION)) && !existingBlockSet.contains( newLoc );
 			} else {
 				// New block is not air or water or a piston head and is not part of the existing ship
-				blockObstructed = (testMaterial != Material.AIR && testMaterial != Material.STATIONARY_WATER 
-                                && testMaterial != Material.WATER && testMaterial != Material.PISTON_EXTENSION) && !existingBlockSet.contains( newLoc );
+				blockObstructed = (!testMaterial.equals(Material.AIR) && !testMaterial.equals(Material.STATIONARY_WATER) 
+                                && !testMaterial.equals(Material.WATER) && !testMaterial.equals(Material.PISTON_EXTENSION)) && !existingBlockSet.contains( newLoc );
 			}
             if (blockObstructed && hoverCraft){
                 // New block is not harvested block and is not part of the existing craft
