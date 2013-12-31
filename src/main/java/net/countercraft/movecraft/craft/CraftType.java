@@ -28,15 +28,15 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.List;
 import org.bukkit.Material;
+import java.util.logging.Level;
 
 public class CraftType {
 	private String craftName;
 	private int maxSize, minSize, minHeightLimit, maxHeightLimit;
 	private Integer[] allowedBlocks, forbiddenBlocks;
-	private boolean canFly, tryNudge, canCruise, canTeleport, canStaticMove,canHover,useGravity;
+	private boolean canFly, tryNudge, canCruise, canTeleport, canStaticMove, canHover, useGravity, canHoverOverWater, moveEntities;
 	private int cruiseSkipBlocks;
 	private double fuelBurnRate;
 	private double sinkPercent;
@@ -45,7 +45,7 @@ public class CraftType {
 	private HashMap<Integer, ArrayList<Double>> flyBlocks = new HashMap<Integer, ArrayList<Double>>();
 	private int hoverLimit;
 	private List<Material> harvestBlocks;
-
+    
 	public CraftType( File f ) {
 		try {
 			parseCraftDataFromFile( f );
@@ -104,28 +104,39 @@ public class CraftType {
 		} else {
 			collisionExplosion=0.0F;
 		}
-	        if (data.containsKey("minHeightLimit")){
-	            minHeightLimit = ( Integer ) data.get( "minHeightLimit" );
-	            if (minHeightLimit<0){minHeightLimit=0;}
-	        }else{
-	            minHeightLimit=0;
-	        }
-	        if (data.containsKey("maxHeightLimit")){
-	            maxHeightLimit = ( Integer ) data.get( "maxHeightLimit" );
-	            if (maxHeightLimit<=minHeightLimit){maxHeightLimit=254;} 
-	        }else{
-	            maxHeightLimit=254; 
-	        }
-	        if(data.containsKey("canHover")) {
-			canHover=(Boolean) data.get("canHover");
+        if (data.containsKey("minHeightLimit")){
+            minHeightLimit = ( Integer ) data.get( "minHeightLimit" );
+            if (minHeightLimit<0){minHeightLimit=0;}
+        }else{
+            minHeightLimit=0;
+        }
+        if (data.containsKey("maxHeightLimit")){
+            maxHeightLimit = ( Integer ) data.get( "maxHeightLimit" );
+            if (maxHeightLimit<=minHeightLimit){maxHeightLimit=254;} 
+        }else{
+            maxHeightLimit=254; 
+        }
+        if(data.containsKey("canHover")) {
+            canHover=(Boolean) data.get("canHover");
 		} else {
 			canHover=false;
 		}
-		if(data.containsKey("useGravity")) {
+		if (data.containsKey("canHoverOverWater")){
+            canHoverOverWater=(Boolean) data.get("canHoverOverWater");
+        }else{
+            canHoverOverWater=true;
+        }
+        if (data.containsKey("moveEntities")){
+            moveEntities=(Boolean) data.get("moveEntities");
+        }else{
+            moveEntities=true;
+        }
+        if(data.containsKey("useGravity")) {
 			useGravity=(Boolean) data.get("useGravity");
         	} else {
 			useGravity=false;
 		}
+        
 		if (data.containsKey("hoverLimit")){
 			hoverLimit = ( Integer ) data.get( "hoverLimit" );
 			if (hoverLimit<0){
@@ -135,15 +146,15 @@ public class CraftType {
 			hoverLimit=0;
 		}
 		harvestBlocks = new ArrayList<Material>(); 
-	        if (data.containsKey("harvestBlocks")){
-			String[] temp = ((ArrayList<String> ) data.get( "harvestBlocks" )).toArray( new String[1] );
-			for (int i = 0; i < temp.length; i++){
-				Material mat = Material.getMaterial(temp[i]);
-				if (mat != null ){
-					harvestBlocks.add(mat);
-				}
-			}
-	        }	
+        if (data.containsKey("harvestBlocks")){
+            String[] temp = ((ArrayList<String> ) data.get( "harvestBlocks" )).toArray( new String[1] );
+            for (int i = 0; i < temp.length; i++){
+                Material mat = Material.getMaterial(temp[i]);
+                if (mat != null ){
+                    harvestBlocks.add(mat);
+                }
+            }
+        }
 		
 	}
 
@@ -211,13 +222,15 @@ public class CraftType {
 		return flyBlocks;
 	}
         
-        public int getMaxHeightLimit(){
+    public int getMaxHeightLimit(){
                 return maxHeightLimit;
-        }
-        public int getMinHeightLimit(){
+    }
+    
+    public int getMinHeightLimit(){
                 return minHeightLimit;
-        }
-        public boolean getCanHover(){
+    }
+    
+    public boolean getCanHover(){
 		return canHover;
 	}
 	
@@ -229,7 +242,16 @@ public class CraftType {
 		return harvestBlocks;
 	}
 	
+    public boolean getCanHoverOverWater(){
+		return canHoverOverWater;
+	}
+    
+    public boolean getMoveEntities(){
+		return moveEntities;
+	}
+    
 	public boolean getUseGravity(){
 		return useGravity;
 	}
+    
 }
