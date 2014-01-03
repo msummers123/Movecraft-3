@@ -33,7 +33,7 @@ public class CommandListener implements Listener {
 			final Craft pCraft = CraftManager.getInstance().getCraftByPlayer( e.getPlayer() );
 
 			if ( pCraft != null ) {
-				CraftManager.getInstance().removeCraft( pCraft );
+				CraftManager.getInstance().removeCraft( pCraft);
 				//e.getPlayer().sendMessage( String.format( I18nSupport.getInternationalisedString( "Player- Craft has been released" ) ) );
 			} else {
 				e.getPlayer().sendMessage( String.format( I18nSupport.getInternationalisedString( "Player- Error - You do not have a craft to release!" ) ) );

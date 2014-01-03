@@ -43,7 +43,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import org.bukkit.Material;
 
 public class TranslationTask extends AsyncTask {
@@ -214,7 +213,7 @@ public class TranslationTask extends AsyncTask {
 			MovecraftLocation oldLoc = blocksList[i];
 			MovecraftLocation newLoc = oldLoc.translate( data.getDx(), data.getDy(), data.getDz() );
 //			newBlockList[i] = newLoc;
-
+            //if (newLoc.getY()<0){
 			if ( newLoc.getY() >= data.getMaxHeight() && newLoc.getY() > oldLoc.getY() ) {
 				fail( String.format( I18nSupport.getInternationalisedString( "Translation - Failed Craft hit height limit" ) ) );
 				break;
@@ -310,8 +309,10 @@ public class TranslationTask extends AsyncTask {
                       break;
                   } else {
                       int explosionKey =  (int) (0-(getCraft().getType().getCollisionExplosion()*100));
-                      explosionSet.add( new MapUpdateCommand( oldLoc, explosionKey, getCraft() ) );
-                      data.setCollisionExplosion(true);
+                      if (!getCraft().getW().getBlockAt(oldLoc.getX(),oldLoc.getY(), oldLoc.getZ()).getType().equals(Material.AIR)){
+                        explosionSet.add( new MapUpdateCommand( oldLoc, explosionKey, getCraft() ) );
+                        data.setCollisionExplosion(true);
+                      }
                   }
                 }
 			} else {
@@ -320,7 +321,7 @@ public class TranslationTask extends AsyncTask {
 				tempBlockList.add(newLoc);
                 
                 if ( i == blocksList.length - 1 ){
-                    if ((hoverCraft && hoverUseGravity) || (hoverUseGravity && newLoc.getY() > data.getMaxHeight() &&  hoverOver ==0) ){
+                    if ((hoverCraft && hoverUseGravity) || (hoverUseGravity && newLoc.getY() > data.getMaxHeight() && hoverOver ==0) ){
                         //hovecraft using gravity or something else using gravity and flying over its limit
                         int iFreeSpace = 0;
                         //canHoverOverWater adds 1 to dY for better check water under craft 
@@ -328,7 +329,7 @@ public class TranslationTask extends AsyncTask {
                         if (hoverOver==0){
                             //we go directly forward so we check if we can go down
                             for (int ii = -1 ;ii > - hoverLimit - 2- (canHoverOverWater?0:1) ; ii--){
-                                if (!isFreeSpace(data.getDx(),hoverOver+ii, data.getDz(), blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater && checkHover)){
+                                if (!isFreeSpace(data.getDx(),hoverOver+ii, data.getDz(), blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater, checkHover)){
                                     break;
                                 }
                                 iFreeSpace ++;
@@ -343,7 +344,7 @@ public class TranslationTask extends AsyncTask {
                         }else if (hoverOver == 1 && !airCraft){
                             //prevent fly heigher than hoverLimit
                             for (int ii = -1 ;ii > - hoverLimit - 2; ii--){
-                                if (!isFreeSpace(data.getDx(),hoverOver+ii, data.getDz(), blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater && checkHover)){
+                                if (!isFreeSpace(data.getDx(),hoverOver+ii, data.getDz(), blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater, checkHover)){
                                     break;
                                 }
                                 iFreeSpace ++;
@@ -356,7 +357,7 @@ public class TranslationTask extends AsyncTask {
                         }else if(hoverOver > 1){
                             //prevent jump thru block  
                             for (int ii = 1 ;ii < hoverOver - 1; ii++){
-                                    if (!isFreeSpace(0,ii, 0, blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater && checkHover)){
+                                    if (!isFreeSpace(0,ii, 0, blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater, checkHover)){
                                         break;
                                     }
                                     iFreeSpace ++;
@@ -370,7 +371,7 @@ public class TranslationTask extends AsyncTask {
                         }else if(hoverOver < -1){
                             //prevent jump thru block  
                             for (int ii = -1 ;ii > hoverOver + 1; ii--){
-                                    if (!isFreeSpace(0,ii, 0, blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater && checkHover)){
+                                    if (!isFreeSpace(0,ii, 0, blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater, checkHover)){
                                         break;
                                     }
                                     iFreeSpace ++;
@@ -387,7 +388,7 @@ public class TranslationTask extends AsyncTask {
                             if (hoverOver >=1){
                                 //others hoverOver values we have checked jet
                                 for (int ii = hoverOver-1 ;ii >hoverOver - hoverLimit - 2; ii--){
-                                    if (!isFreeSpace(0,ii, 0, blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater && checkHover)){
+                                    if (!isFreeSpace(0,ii, 0, blocksList, existingBlockSet, waterCraft, hoverCraft, harvestBlocks,canHoverOverWater, checkHover)){
                                         break;
                                     }
                                     iFreeSpace ++;
@@ -429,7 +430,7 @@ public class TranslationTask extends AsyncTask {
 			MovecraftLocation[] newBlockList = (MovecraftLocation[]) tempBlockList.toArray(new MovecraftLocation[0]);
 			data.setBlockList( newBlockList );
             
-            //prevents torpedo and rocket drivers
+            //prevents torpedo and rocket pilots :)
             if (getCraft().getType().getMoveEntities()){
                 // Move entities within the craft
                 List<Entity> eList=null;
@@ -463,6 +464,9 @@ public class TranslationTask extends AsyncTask {
                         }
                     }
                 }
+            }else{
+                //add releaseTask without playermove to manager
+                CraftManager.getInstance().addReleaseTask(getCraft());
             }
 			
 			//Set blocks that are no longer craft to air
@@ -511,10 +515,10 @@ public class TranslationTask extends AsyncTask {
 		return data;
 	}
     
-    private boolean isFreeSpace(int x, int y, int z, MovecraftLocation[] blocksList, HashSet<MovecraftLocation> existingBlockSet, boolean waterCraft, boolean hoverCraft, List<Material> harvestBlocks, boolean canHoverOverWater){
+    private boolean isFreeSpace(int x, int y, int z, MovecraftLocation[] blocksList, HashSet<MovecraftLocation> existingBlockSet, boolean waterCraft, boolean hoverCraft, List<Material> harvestBlocks, boolean canHoverOverWater,boolean checkHover){
         boolean isFree = true;
         // this checking for hovercrafts should be faster with separating horizontal layers and checking only realy necesseries,
-        // or more better: remember what checked in each translation, but it's beyond my current abilities, I will try to solve it
+        // or more better: remember what checked in each translation, but it's beyond my current abilities, I will try to solve it in future
 	
         for ( int i = 0; i < blocksList.length; i++ ) {
             MovecraftLocation oldLoc = blocksList[i];
@@ -527,7 +531,8 @@ public class TranslationTask extends AsyncTask {
                 }
             }
             
-            if ( newLoc.getY() >= data.getMaxHeight() && newLoc.getY() > oldLoc.getY() ) {
+            if ( newLoc.getY() >= data.getMaxHeight() && newLoc.getY() > oldLoc.getY() && !checkHover ) {
+            //if ( newLoc.getY() >= data.getMaxHeight() && newLoc.getY() > oldLoc.getY()) {
                 isFree = false;
                 break;
             } else if ( newLoc.getY() <= data.getMinHeight() && newLoc.getY() < oldLoc.getY() ) {
@@ -558,6 +563,9 @@ public class TranslationTask extends AsyncTask {
                 break;
             } 
         }
+        
         return isFree;
+        
     }
+    
 }

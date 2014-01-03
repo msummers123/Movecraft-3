@@ -31,10 +31,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.HashMap;
 
 public class PlayerListener implements Listener {
-	private final HashMap<Player, BukkitTask> releaseEvents = new HashMap<Player, BukkitTask>();
+   
 
 	@EventHandler
 	public void onPLayerLogout( PlayerQuitEvent e ) {
@@ -66,7 +65,7 @@ public class PlayerListener implements Listener {
 		if ( c != null ) {
 			if ( !MathUtils.playerIsWithinBoundingPolygon( c.getHitBox(), c.getMinX(), c.getMinZ(), MathUtils.bukkit2MovecraftLoc( event.getPlayer().getLocation() ) ) ) {
 
-				if ( !releaseEvents.containsKey( event.getPlayer() ) ) {
+				if ( !CraftManager.getInstance().getReleaseEvents().containsKey( event.getPlayer() ) ) {
 					event.getPlayer().sendMessage( String.format( I18nSupport.getInternationalisedString( "Release - Player has left craft" ) ) );
 
 					BukkitTask releaseTask = new BukkitRunnable() {
@@ -78,12 +77,15 @@ public class PlayerListener implements Listener {
 
 					}.runTaskLater( Movecraft.getInstance(), ( 20 * 15 ) );
 
-					releaseEvents.put( event.getPlayer(), releaseTask );
+					CraftManager.getInstance().getReleaseEvents().put( event.getPlayer(), releaseTask );
 				}
 
-			} else if ( releaseEvents.containsKey( event.getPlayer() ) ) {
-				releaseEvents.get( event.getPlayer() ).cancel();
-				releaseEvents.remove( event.getPlayer() );
+			} else if ( CraftManager.getInstance().getReleaseEvents().containsKey(event.getPlayer()) && c.getType().getMoveEntities()) {
+				/*
+                CraftManager.getInstance().getReleaseEvents().get( event.getPlayer() ).cancel();
+				CraftManager.getInstance().getReleaseEvents().remove( event.getPlayer() );
+                */
+                CraftManager.getInstance().removeReleaseTask(c);
 			}
 		}
 	}
