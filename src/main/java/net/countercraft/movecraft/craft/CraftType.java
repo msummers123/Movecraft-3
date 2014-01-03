@@ -112,9 +112,9 @@ public class CraftType {
         }
         if (data.containsKey("maxHeightLimit")){
             maxHeightLimit = ( Integer ) data.get( "maxHeightLimit" );
-            if (maxHeightLimit<=minHeightLimit){maxHeightLimit=254;} 
+            if (maxHeightLimit<minHeightLimit){maxHeightLimit=255;} 
         }else{
-            maxHeightLimit=254; 
+            maxHeightLimit=255; 
         }
         if(data.containsKey("canHover")) {
             canHover=(Boolean) data.get("canHover");
