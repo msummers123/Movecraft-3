@@ -168,19 +168,21 @@ public class MapUpdateManager extends BukkitRunnable {
 
 				// Preprocessing
 				for ( MapUpdateCommand c : updatesInWorld ) {
-					MovecraftLocation l = c.getOldBlockLocation();
+                    if (c !=null){ //temporary fix, please check sinking and exlposion adds to updates 
+                        MovecraftLocation l = c.getOldBlockLocation();
 
-					if ( l != null ) {
-						TransferData blockDataPacket = getBlockDataPacket( w.getBlockAt( l.getX(), l.getY(), l.getZ() ).getState(), c.getRotation() );
-						if ( blockDataPacket != null ) {
-							dataMap.put( c.getNewBlockLocation(), blockDataPacket );
-						}
-						
-						//remove dispensers and replace them with stone blocks to prevent firing during ship reconstruction
-						if(w.getBlockAt( l.getX(), l.getY(), l.getZ() ).getTypeId()==23) {
-							w.getBlockAt( l.getX(), l.getY(), l.getZ() ).setTypeIdAndData( 1, (byte) 0, false );
-						}
-					}					
+                        if ( l != null ) {
+                            TransferData blockDataPacket = getBlockDataPacket( w.getBlockAt( l.getX(), l.getY(), l.getZ() ).getState(), c.getRotation() );
+                            if ( blockDataPacket != null ) {
+                                dataMap.put( c.getNewBlockLocation(), blockDataPacket );
+                            }
+
+                            //remove dispensers and replace them with stone blocks to prevent firing during ship reconstruction
+                            if(w.getBlockAt( l.getX(), l.getY(), l.getZ() ).getTypeId()==23) {
+                                w.getBlockAt( l.getX(), l.getY(), l.getZ() ).setTypeIdAndData( 1, (byte) 0, false );
+                            }
+                        }
+                   }
 				} 
 				// track the blocks that entities will be standing on to move them smoothly with the craft
 				if(entityUpdatesInWorld!=null) {
