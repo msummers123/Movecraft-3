@@ -277,7 +277,6 @@ public class TranslationTask extends AsyncTask {
                                 //if we can't go up so we test bottom side
                                 data.setDy(-1);
                                 hoverOver = -1;
-                                CraftManager.getInstance().getPlayerFromCraft(getCraft()).sendMessage(String.valueOf(newLoc.getY() + " A"));
                             }else{
                                 // no way - back to original dY, turn off hovercraft for this move
                                 // and get original data again for all explosions
