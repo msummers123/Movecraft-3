@@ -408,7 +408,6 @@ public class AsyncManager extends BukkitRunnable {
                             }
                         }else{
                             // don't process under 0 level
-                            
                             sBlocks.remove();
                         }
 					}
