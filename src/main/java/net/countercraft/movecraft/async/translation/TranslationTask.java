@@ -214,10 +214,10 @@ public class TranslationTask extends AsyncTask {
 			MovecraftLocation newLoc = oldLoc.translate( data.getDx(), data.getDy(), data.getDz() );
 //			newBlockList[i] = newLoc;
             //if (newLoc.getY()<0){
-			if ( newLoc.getY() >= data.getMaxHeight() && newLoc.getY() > oldLoc.getY() ) {
+			if ( newLoc.getY() > data.getMaxHeight() && newLoc.getY() > oldLoc.getY() ) {
 				fail( String.format( I18nSupport.getInternationalisedString( "Translation - Failed Craft hit height limit" ) ) );
 				break;
-			} else if ( newLoc.getY() <= data.getMinHeight()  && newLoc.getY() < oldLoc.getY() ) {
+			} else if ( newLoc.getY() < data.getMinHeight()  && newLoc.getY() < oldLoc.getY() ) {
 				fail( String.format( I18nSupport.getInternationalisedString( "Translation - Failed Craft hit minimum height limit" ) ) );
 				break;
 			}
@@ -257,51 +257,69 @@ public class TranslationTask extends AsyncTask {
                 }
             }
 			
-			if ( blockObstructed ) {
+            if ( blockObstructed ) {
 				if (hoverCraft && checkHover){
-                    //we check one down and one up ever, if it is hovercraft
-                    if (hoverOver == 0){
+                    //we check one up ever, if it is hovercraft and one down if it's using gravity
+                    if (hoverOver == 0 && newLoc.getY() + 1 <= data.getMaxHeight()){
                         //fist was checked actual level, now check if we can go up
-                        hoverOver = +1;
-                        data.setDy(data.getDy()+1); 
+                        hoverOver = 1;
+                        data.setDy(1); 
                         clearNewData = true;
-                    }else if (hoverOver <=-1) {
-                        //we cant go down for 1 block, check more to hoverLimit
-                        if (hoverOver > -hoverLimit - 1){
-                            data.setDy(hoverOver - 1); 
-                            hoverOver -= 1;
-                            clearNewData = true;
-                        }else{
-                            // no way - back to original dY, turn off hovercraft for this move
-                            // and get original data again for all explosions
-                            data.setDy(data.getDy()-hoverOver);
-                            hoverOver = 0;
-                            clearNewData = true; 
-                            hoverCraft = false;
-                        }
                     }else if (hoverOver >= 1){ 
                         //check other options to go up
-                        if (hoverOver < hoverLimit + 1){
+                        if (hoverOver < hoverLimit + 1 && newLoc.getY() + 1 <= data.getMaxHeight()){
                             data.setDy(hoverOver + 1);
                             hoverOver += 1;
                             clearNewData = true;    
                         }else{
-                            if (hoverUseGravity){
+                            if (hoverUseGravity && newLoc.getY() - hoverOver -1 >= data.getMinHeight()){
                                 //we are on the maximum of top 
                                 //if we can't go up so we test bottom side
                                 data.setDy(-1);
-                                hoverOver = -1; 
+                                hoverOver = -1;
+                                CraftManager.getInstance().getPlayerFromCraft(getCraft()).sendMessage(String.valueOf(newLoc.getY() + " A"));
                             }else{
                                 // no way - back to original dY, turn off hovercraft for this move
                                 // and get original data again for all explosions
                                 data.setDy(0);
                                 hoverOver = 0;
                                 hoverCraft = false;
+                                hoverUseGravity=false;
                             }
                             clearNewData = true; 
                         }
-                    }
-                    
+                    }else if (hoverOver <=-1) {
+                        //we cant go down for 1 block, check more to hoverLimit
+                        if (hoverOver > -hoverLimit - 1 && newLoc.getY() - 1 >= data.getMinHeight()){
+                            data.setDy(hoverOver - 1); 
+                            hoverOver -= 1;
+                            clearNewData = true;
+                        }else{
+                            // no way - back to original dY, turn off hovercraft for this move
+                            // and get original data again for all explosions
+                            data.setDy(0);
+                            hoverOver = 0;
+                            hoverUseGravity = false;
+                            clearNewData = true; 
+                            hoverCraft = false;
+                        }
+                    }else{
+                        // no way - reached MaxHeight during looking new way upstairss 
+                        if (hoverUseGravity && newLoc.getY() -1 >= data.getMinHeight()){
+                                //we are on the maximum of top 
+                                //if we can't go up so we test bottom side
+                                data.setDy(-1);
+                                hoverOver = -1;
+                        }else{
+                            // - back to original dY, turn off hovercraft for this move
+                            // and get original data again for all explosions
+                            data.setDy(0);
+                            hoverOver = 0;
+                            hoverUseGravity = false;
+                            hoverCraft = false;
+                        }
+                        clearNewData = true; 
+                    }    
                 }else{
                   // Explode if the craft is set to have a CollisionExplosion. Also keep moving for spectacular ramming collisions
                   if( getCraft().getType().getCollisionExplosion() == 0.0F) {
@@ -336,9 +354,8 @@ public class TranslationTask extends AsyncTask {
                             }
                             if (data.failed()){break;}
                             if (iFreeSpace > hoverLimit-(canHoverOverWater?0:1)){
-                                data.setDy(-1);//data.getDy()-1);
+                                data.setDy(-1);
                                 hoverOver = -1;
-                                //hoverCraft = false;
                                 clearNewData=true;
                             }
                         }else if (hoverOver == 1 && !airCraft){
