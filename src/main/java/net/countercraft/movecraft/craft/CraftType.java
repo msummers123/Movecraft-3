@@ -63,6 +63,8 @@ public class CraftType {
 	private int hoverLimit;
 	private List<Material> harvestBlocks;
         private List<Material> harvesterBladeBlocks;
+        private boolean harvesterCanStoreItems;
+	private boolean harvesterCanDropItems;
 	        
 	public CraftType( File f ) {
 		try {
@@ -410,6 +412,16 @@ public class CraftType {
                             }
                     }
             }
+            if (data.containsKey("harvesterCanStoreItems")){
+        	harvesterCanStoreItems =(Boolean) data.get("harvesterCanStoreItems");
+            } else {
+                harvesterCanStoreItems = true;
+            }
+            if (data.containsKey("harvesterCanDropItems")){
+        	harvesterCanDropItems =(Boolean) data.get("harvesterCanDropItems");
+            } else {
+                harvesterCanDropItems = true;
+            }
             if (data.containsKey("allowVerticalTakeoffAndLanding")){
                 allowVerticalTakeoffAndLanding = (Boolean) data.get("allowVerticalTakeoffAndLanding");
             }else{
@@ -588,5 +600,12 @@ public class CraftType {
     
     public boolean  allowVerticalTakeoffAndLanding(){
         return allowVerticalTakeoffAndLanding;
+    }
+    
+    public boolean getHarvesterCanDropItems(){
+        return harvesterCanDropItems;
+    }
+    public boolean getHarvesterCanStoreItems(){
+        return harvesterCanStoreItems;
     }
 }
