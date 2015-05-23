@@ -45,6 +45,7 @@ public class Settings {
 	public static double RepairMoneyPerBlock = 0.0;
 	public static boolean FireballPenetration = true;
 	public static boolean AllowCrewSigns = true;
+	public static boolean ArrowPopWool = true;
         public static boolean WGCustomFlagsUsePilotFlag = false;
         public static boolean WGCustomFlagsUseMoveFlag = false;
         public static boolean WGCustomFlagsUseRotateFlag = false;

@@ -313,8 +313,8 @@ public class BlockListener implements Listener {
 						
 						if (y != -1) {
 							Block block = e.getEntity().getWorld().getBlockAt(x, y, z);
-							// If block is wool
-							if (block.getType() == Material.WOOL) {
+							// Check to remove block
+							if (block.getType() == Material.WOOL && Settings.ArrowPopWool) {
 								// "pop" it
 								block.setType(Material.AIR);
 								e.getEntity().remove();

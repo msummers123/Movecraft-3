@@ -116,6 +116,7 @@ public class Movecraft extends JavaPlugin {
 		Settings.FireballLifespan = getConfig().getInt("FireballLifespan", 6);
 		Settings.FireballPenetration = getConfig().getBoolean("FireballPenetration", true);
 		Settings.AllowCrewSigns = getConfig().getBoolean("AllowCrewSigns", true);
+		Settings.ArrowPopWool = getConfig().getBoolean("ArrowsPopWool", true);
 		Settings.RequireCreatePerm = getConfig().getBoolean("RequireCreatePerm", false);
 		Settings.TNTContactExplosives = getConfig().getBoolean("TNTContactExplosives", true);
 		Settings.FadeWrecksAfter = getConfig().getInt("FadeWrecksAfter", 0);
