@@ -17,6 +17,7 @@ FadeWrecksAfter: 0
 RepairTicksPerBlock: 10
 RepairMoneyPerBlock: 10
 AllowCrewSigns: true
+ArrowsPopWool: true
 WGCustomFlagsUsePilotFlag: false
 WGCustomFlagsUseMoveFlag: false
 WGCustomFlagsUseRotateFlag: false
