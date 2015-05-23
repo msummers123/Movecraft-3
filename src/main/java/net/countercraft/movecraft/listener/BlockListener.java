@@ -17,6 +17,7 @@
 
 package net.countercraft.movecraft.listener;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
@@ -31,6 +32,7 @@ import net.countercraft.movecraft.localisation.I18nSupport;
 import net.countercraft.movecraft.utils.MapUpdateManager;
 import net.countercraft.movecraft.utils.MathUtils;
 import net.countercraft.movecraft.utils.MovecraftLocation;
+import net.minecraft.server.v1_8_R2.EntityArrow;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -38,6 +40,8 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.v1_8_R2.entity.CraftArrow;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -52,6 +56,7 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -280,4 +285,48 @@ public class BlockListener implements Listener {
 			}            
         }
     }
+	
+	@EventHandler
+	private void onProjectileHit(final ProjectileHitEvent e) {
+		if (e.getEntityType() == EntityType.ARROW) {
+			// Must be run in a delayed task otherwise it won't be able to find
+			// the block
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Movecraft.getInstance(), new Runnable() {
+				
+				@Override
+				public void run() {
+					try {
+						
+						EntityArrow entityArrow = ((CraftArrow) e.getEntity()).getHandle();
+						
+						Field fieldX = EntityArrow.class.getDeclaredField("d");
+						Field fieldY = EntityArrow.class.getDeclaredField("e");
+						Field fieldZ = EntityArrow.class.getDeclaredField("f");
+						
+						fieldX.setAccessible(true);
+						fieldY.setAccessible(true);
+						fieldZ.setAccessible(true);
+						
+						int x = fieldX.getInt(entityArrow);
+						int y = fieldY.getInt(entityArrow);
+						int z = fieldZ.getInt(entityArrow);
+						
+						if (y != -1) {
+							Block block = e.getEntity().getWorld().getBlockAt(x, y, z);
+							// If block is wool
+							if (block.getType() == Material.WOOL) {
+								// "pop" it
+								block.setType(Material.AIR);
+								e.getEntity().remove();
+							}
+						}
+						
+					} catch (Exception e) {
+						return;
+					}
+				}
+			});
+			
+		}
+	}
 }
