@@ -1,5 +1,5 @@
 /*
-s * This file is part of Movecraft.
+ * This file is part of Movecraft.
  *
  *     Movecraft is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -65,72 +65,72 @@ public class CommandListener implements CommandExecutor {
 	}
 
 	private Location getCraftTeleportPoint(Craft craft, World w) {
-		int maxDX = 0;
-		int maxDZ = 0;
-		int maxY = 0;
-		int minY = 32767;
-		for (int[][] i1 : craft.getHitBox()) {
+		int maxDX=0;
+		int maxDZ=0;
+		int maxY=0;
+		int minY=32767;
+		for(int[][] i1 : craft.getHitBox()) {
 			maxDX++;
-			if (i1 != null) {
-				int indexZ = 0;
+			if (i1!=null) {
+				int indexZ=0;
 				for (int[] i2 : i1) {
 					indexZ++;
-					if (i2 != null) {
-						if (i2[0] < minY) {
-							minY = i2[0];
+					if (i2!=null) {
+						if (i2[0]<minY) {
+							minY=i2[0];
 						}
 					}
-					if (i2 != null) {
-						if (i2[1] > maxY) {
-							maxY = i2[1];
+					if (i2!=null) {
+						if (i2[1]>maxY) {
+							maxY=i2[1];
 						}
 					}
 				}
-				if (indexZ > maxDZ) {
-					maxDZ = indexZ;
+				if (indexZ>maxDZ) {
+					maxDZ=indexZ;
 				}
 
 			}
 		}
-		int telX = craft.getMinX() + (maxDX / 2);
-		int telZ = craft.getMinZ() + (maxDZ / 2);
-		int telY = maxY;
-		Location telPoint = new Location(w, telX, telY, telZ);
+		int telX=craft.getMinX()+(maxDX / 2);
+		int telZ=craft.getMinZ()+(maxDZ / 2);
+		int telY=maxY;
+		Location telPoint=new Location(w, telX, telY, telZ);
 		return telPoint;
 	}
 
 	private MovecraftLocation getCraftMidPoint(Craft craft) {
-		int maxDX = 0;
-		int maxDZ = 0;
-		int maxY = 0;
-		int minY = 32767;
-		for (int[][] i1 : craft.getHitBox()) {
+		int maxDX=0;
+		int maxDZ=0;
+		int maxY=0;
+		int minY=32767;
+		for(int[][] i1 : craft.getHitBox()) {
 			maxDX++;
-			if (i1 != null) {
-				int indexZ = 0;
-				for (int[] i2 : i1) {
+			if (i1!=null) {
+				int indexZ=0;
+				for(int[] i2 : i1) {
 					indexZ++;
-					if (i2 != null) {
-						if (i2[0] < minY) {
-							minY = i2[0];
+					if(i2!=null) {
+						if(i2[0]<minY) {
+							minY=i2[0];
 						}
 					}
-					if (i2 != null) {
-						if (i2[1] < maxY) {
-							maxY = i2[1];
+					if (i2!=null) {
+						if(i2[1]<maxY) {
+							maxY=i2[1];
 						}
 					}
 				}
-				if (indexZ > maxDZ) {
-					maxDZ = indexZ;
+				if (indexZ>maxDZ) {
+					maxDZ=indexZ;
 				}
 
 			}
 		}
-		int midX = craft.getMinX() + (maxDX / 2);
-		int midY = (minY + maxY) / 2;
-		int midZ = craft.getMinZ() + (maxDZ / 2);
-		MovecraftLocation midPoint = new MovecraftLocation(midX, midY, midZ);
+		int midX=craft.getMinX()+(maxDX/2);
+		int midY=(minY+maxY)/2;
+		int midZ=craft.getMinZ()+(maxDZ/2);
+		MovecraftLocation midPoint=new MovecraftLocation(midX, midY, midZ);
 		return midPoint;
 	}
 
@@ -325,7 +325,7 @@ public class CommandListener implements CommandExecutor {
 				return true;
 			}
 			
-			boolean noCraftsFound=true;.
+			boolean noCraftsFound=true;
 			if(CraftManager.getInstance().getCraftsInWorld(player.getWorld())!=null)
 				for(Craft craft : CraftManager.getInstance().getCraftsInWorld(player.getWorld())) {
 					if(craft!=null) {
