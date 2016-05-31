@@ -151,18 +151,17 @@ public class CommandListener implements CommandExecutor {
 				return true;
 			}
 			if(args.length > 0) {
-				if (args[0] != -a) {
-					Player target = Bukkit.getPlayerExact(args[0]);
-				}
-				if(target == null) {
+				Player target = Bukkit.getPlayerExact(args[0]);
+				if( target == null  && args[0] != "-a") {
 					sender.sendMessage("That player could not be found");
 				} else {
-					if(!player.hasPermssion("movecraft.commands.release.others")) {
+					if(!player.hasPermission("movecraft.commands.release.others")) {
 						player.sendMessage("You do not have permission to make others release");
 					} else {
-						if (args[0] == -a) {
+						if (args[0] == "-a") {
 							for (Player p : Bukkit.getOnlinePlayers()) {
-								final Craft pCraft = CraftManager.getInstance().getCraftByPlayerName(p);
+								String name = p.getName();
+								final Craft pCraft = CraftManager.getInstance().getCraftByPlayerName(name);
 								if(pCraft != null) {
 									CraftManager.getInstance().removeCraft(pCraft);
 									
