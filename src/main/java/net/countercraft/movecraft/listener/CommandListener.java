@@ -54,16 +54,16 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 //public class CommandListener implements Listener {
 public class CommandListener implements CommandExecutor {
 
-	private CraftType getCraftTypeFromString( String s ) {
-		for ( CraftType t : CraftManager.getInstance().getCraftTypes() ) {
-			if ( s.equalsIgnoreCase( t.getCraftName() ) ) {
+	private CraftType getCraftTypeFromString(String s) {
+		for (CraftType t : CraftManager.getInstance().getCraftTypes()) {
+			if (s.equalsIgnoreCase(t.getCraftName())) {
 				return t;
 			}
 		}
 
 		return null;
 	}
-	
+
 	private Location getCraftTeleportPoint(Craft craft, World w) {
 		int maxDX=0;
 		int maxDZ=0;
@@ -71,34 +71,34 @@ public class CommandListener implements CommandExecutor {
 		int minY=32767;
 		for(int[][] i1 : craft.getHitBox()) {
 			maxDX++;
-			if(i1!=null) {
+			if (i1!=null) {
 				int indexZ=0;
-				for(int[] i2 : i1) {
+				for (int[] i2 : i1) {
 					indexZ++;
-					if(i2!=null) {
-						if(i2[0]<minY) {
+					if (i2!=null) {
+						if (i2[0]<minY) {
 							minY=i2[0];
 						}
 					}
-					if(i2!=null) {
-						if(i2[1]>maxY) {
+					if (i2!=null) {
+						if (i2[1]>maxY) {
 							maxY=i2[1];
 						}
 					}
 				}
-				if(indexZ>maxDZ) {
+				if (indexZ>maxDZ) {
 					maxDZ=indexZ;
 				}
-				
+
 			}
 		}
-		int telX=craft.getMinX()+(maxDX/2);
-		int telZ=craft.getMinZ()+(maxDZ/2);
+		int telX=craft.getMinX()+(maxDX / 2);
+		int telZ=craft.getMinZ()+(maxDZ / 2);
 		int telY=maxY;
 		Location telPoint=new Location(w, telX, telY, telZ);
 		return telPoint;
 	}
-	
+
 	private MovecraftLocation getCraftMidPoint(Craft craft) {
 		int maxDX=0;
 		int maxDZ=0;
@@ -106,7 +106,7 @@ public class CommandListener implements CommandExecutor {
 		int minY=32767;
 		for(int[][] i1 : craft.getHitBox()) {
 			maxDX++;
-			if(i1!=null) {
+			if (i1!=null) {
 				int indexZ=0;
 				for(int[] i2 : i1) {
 					indexZ++;
@@ -115,16 +115,16 @@ public class CommandListener implements CommandExecutor {
 							minY=i2[0];
 						}
 					}
-					if(i2!=null) {
+					if (i2!=null) {
 						if(i2[1]<maxY) {
 							maxY=i2[1];
 						}
 					}
 				}
-				if(indexZ>maxDZ) {
+				if (indexZ>maxDZ) {
 					maxDZ=indexZ;
 				}
-				
+
 			}
 		}
 		int midX=craft.getMinX()+(maxDX/2);
@@ -133,7 +133,7 @@ public class CommandListener implements CommandExecutor {
 		MovecraftLocation midPoint=new MovecraftLocation(midX, midY, midZ);
 		return midPoint;
 	}
-	
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 //	public void onCommand( PlayerCommandPreprocessEvent e ) {
@@ -150,7 +150,37 @@ public class CommandListener implements CommandExecutor {
 				player.sendMessage( String.format( I18nSupport.getInternationalisedString( "Insufficient Permissions" ) ) );
 				return true;
 			}
-			
+			if(args.length > 0) {
+				if (args[0] != -a) {
+					Player target = Bukkit.getPlayerExact(args[0]);
+				}
+				if(target == null) {
+					sender.sendMessage("That player could not be found");
+				} else {
+					if(!player.hasPermssion("movecraft.commands.release.others")) {
+						player.sendMessage("You do not have permission to make others release");
+					} else {
+						if (args[0] == -a) {
+							for (Player p : Bukkit.getOnlinePlayers()) {
+								final Craft pCraft = CraftManager.getInstance().getCraftByPlayerName(p);
+								if(pCraft != null) {
+									CraftManager.getInstance().removeCraft(pCraft);
+									
+							}
+						}
+							player.sendMessage("You forced release very player's ship");
+						} else {
+						final Craft pCraft = CraftManager.getInstance().getCraftByPlayerName(args[0]);
+						if(pCraft != null) {
+							CraftManager.getInstance().removeCraft(pCraft);
+							player.sendMessage("You have successfully force released a ship");
+						} else {
+							player.sendMessage("That player is not piloting a craft");
+						}
+					}
+				}
+			}
+				} else {
 			final Craft pCraft = CraftManager.getInstance().getCraftByPlayerName( player.getName() );
 
 			if ( pCraft != null ) {
@@ -162,6 +192,7 @@ public class CommandListener implements CommandExecutor {
 
 			return true;
 		}
+	}
 
 		if ( cmd.getName().equalsIgnoreCase("pilot" ) ) {
 			if ( !player.hasPermission( "movecraft.commands" ) && !player.hasPermission( "movecraft.commands.pilot" ) ) {
