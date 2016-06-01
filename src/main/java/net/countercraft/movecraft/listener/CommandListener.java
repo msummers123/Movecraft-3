@@ -469,7 +469,8 @@ public class CommandListener implements CommandExecutor {
             		int hour = rightNow.get(Calendar.HOUR_OF_DAY);
             		int minute = rightNow.get(Calendar.MINUTE);
             		int currMilitaryTime=hour*100+minute;
-            		if((currMilitaryTime>Settings.SiegeScheduleStart.get(foundSiegeName))&&(currMilitaryTime<Settings.SiegeScheduleEnd.get(foundSiegeName))) {
+            		int dayOfWeek = rightNow.get(Calendar.DAY_OF_WEEK);
+            		if((currMilitaryTime>Settings.SiegeScheduleStart.get(foundSiegeName))&&(currMilitaryTime<Settings.SiegeScheduleEnd.get(foundSiegeName)) && dayOfWeek == Settings.SiegeDayOfTheWeek.get(foundSiegeName)) {
             			Bukkit.getServer().broadcastMessage(String.format("%s is preparing to siege %s! All players wishing to participate in the defense should head there immediately! Siege will begin in %d minutes"
             						, player.getDisplayName(), foundSiegeName, Settings.SiegeDelay.get(foundSiegeName) / 60));
                         for(Player p : Bukkit.getOnlinePlayers()) {
