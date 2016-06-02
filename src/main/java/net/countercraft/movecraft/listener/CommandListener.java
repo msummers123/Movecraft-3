@@ -53,7 +53,9 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 //public class CommandListener implements Listener {
 public class CommandListener implements CommandExecutor {
-
+	public static boolean unmerging = false;
+	public static PermissionAttachment unmergeAttachment;
+	
 	private CraftType getCraftTypeFromString( String s ) {
 		for ( CraftType t : CraftManager.getInstance().getCraftTypes() ) {
 			if ( s.equalsIgnoreCase( t.getCraftName() ) ) {
@@ -380,7 +382,7 @@ public class CommandListener implements CommandExecutor {
 				
 		}
 		
-		if(cmd.getName().equalsIgnoreCase("manOverBoard")) {
+		if(cmd.getName().equalsIgnoreCase("manoverboard")) {
 			if(CraftManager.getInstance().getCraftByPlayerName(player.getName())!=null) {
 				Location telPoint = getCraftTeleportPoint(CraftManager.getInstance().getCraftByPlayerName(player.getName()), CraftManager.getInstance().getCraftByPlayerName(player.getName()).getW());
 				player.teleport(telPoint);
@@ -506,6 +508,31 @@ public class CommandListener implements CommandExecutor {
 				player.sendMessage( String.format( I18nSupport.getInternationalisedString( "Could not find a siege configuration for the region you are in" ) ) );
 				return true;
             }
+		}
+		
+		if (cmd.getName().equalsIgnoreCase("unmerge")) {
+			if (unmerging) {
+				// Remove permission to break any block.
+				player.removeAttachment(unmergeAttachment);
+
+				// Toggle unmerging bool
+				unmerging = false;
+				
+				// Restore blocks broken
+				for (BlockState blockStateToBeRestored : BlockListener.unmergeBlockStates) {
+					blockStateToBeRestored.update();
+				}
+				
+				// Clear the array
+				BlockListener.unmergeBlockStates = new ArrayList<BlockState>();
+				
+			} else {
+				// Add permission to break any block.
+				unmergeAttachment = player.addAttachment(this, "worldguard.build.block.remove.*", yes, 6000);
+				
+				// Toggle unmerging bool
+				unmerging = true;
+			}
 		}
 		
 		return false;

@@ -168,6 +168,24 @@ public class PlayerListener implements Listener {
 		if ( c != null ) {
 			CraftManager.getInstance().removeCraft( c );
 		}
+		
+		// Disable unmerging mode
+		if (CommandListener.unmerging) {
+			// Remove permission to break any block.
+			player.removeAttachment(CommandListener.unmergeAttachment);
+
+			// Toggle unmerging bool			
+			CommandListener.unmerging = false;
+			
+			// Restore blocks broken
+			for (BlockState blockStateToBeRestored : BlockListener.unmergeBlockStates) {
+				blockStateToBeRestored.update();
+			}
+				
+			// Clear the array
+			BlockListener.unmergeBlockStates = new ArrayList<BlockState>();
+				
+		}
 	}
 
 /*	public void onPlayerDamaged( EntityDamageByEntityEvent e ) {
