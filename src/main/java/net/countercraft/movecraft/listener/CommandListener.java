@@ -54,7 +54,8 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 //public class CommandListener implements Listener {
 public class CommandListener implements CommandExecutor {
 	public static boolean unmerging = false;
-
+	public static PermissionAttachment unmergeAttachment;
+	
 	private CraftType getCraftTypeFromString( String s ) {
 		for ( CraftType t : CraftManager.getInstance().getCraftTypes() ) {
 			if ( s.equalsIgnoreCase( t.getCraftName() ) ) {
@@ -512,7 +513,8 @@ public class CommandListener implements CommandExecutor {
 		if (cmd.getName().equalsIgnoreCase("unmerge")) {
 			if (unmerging) {
 				// Remove permission to break any block.
-				
+				player.removeAttachment(unmergeAttachment);
+
 				// Toggle unmerging bool
 				unmerging = false;
 				
@@ -521,8 +523,12 @@ public class CommandListener implements CommandExecutor {
 					blockStateToBeRestored.update();
 				}
 				
+				// Clear the array
+				BlockListener.unmergeBlockStates = new ArrayList<BlockState>();
+				
 			} else {
 				// Add permission to break any block.
+				unmergeAttachment = player.addAttachment(plugin, "node", yes);
 				
 				// Toggle unmerging bool
 				unmerging = true;
