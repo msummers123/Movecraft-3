@@ -66,7 +66,7 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 
 public class BlockListener implements Listener {
-	public static List<Block> unmergeBlocks;
+	public static List<BlockState> unmergeBlockStates;
 	
 	@EventHandler
 	public void onBlockPlace( final BlockPlaceEvent e ) {
@@ -150,12 +150,12 @@ public class BlockListener implements Listener {
 		// If unmerging log the bock, and place bedrock at its old location.
 		if (CommandListener.unmerging) {
 			// Add the broken block to the array
-			Block brokenBlock =  e.getBlock()
-			if (!unmergeBlocks) {
-				unmergeBlocks = new ArrayList<Block>();
+			BlockState brokenBlockState =  e.getBlock().getState();
+			if (!unmergeBlockStates) {
+				unmergeBlockStates = new ArrayList<BlockState>();
 			}
 			
-			unmergeBlocks.add(brokenBlock);
+			unmergeBlockStates.add(brokenBlockState);
 			
 			// Set a bedrock at its location
 			e.getBlock().setType(Material.BEDROCK);
