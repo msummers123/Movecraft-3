@@ -292,6 +292,23 @@ public class InteractListener implements Listener {
 				}
 				
 				event.setCancelled( true );
+				
+				// Disbale merging state
+				if (CommandListener.unmerging) {
+					// Remove permission to break any block.
+					event.getPlayer().removeAttachment(CommandListener.unmergeAttachment);
+
+					// Toggle unmerging bool
+					CommandListener.unmerging = false;
+				
+					// Restore blocks broken
+					for (BlockState blockStateToBeRestored : BlockListener.unmergeBlockStates) {
+						blockStateToBeRestored.update();
+					}
+				
+					// Clear the array
+					BlockListener.unmergeBlockStates = new ArrayList<BlockState>();
+				}
 			} else {
 			event.getPlayer().sendMessage( String.format( I18nSupport.getInternationalisedString( "Insufficient Permissions" ) ) );
 
