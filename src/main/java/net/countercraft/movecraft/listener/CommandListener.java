@@ -528,7 +528,7 @@ public class CommandListener implements CommandExecutor {
 				
 			} else {
 				// Add permission to break any block.
-				unmergeAttachment = player.addAttachment(plugin, "node", yes);
+				unmergeAttachment = player.addAttachment(this, "worldguard.build.block.remove.*", yes, 6000);
 				
 				// Toggle unmerging bool
 				unmerging = true;
