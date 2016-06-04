@@ -153,10 +153,10 @@ public class CommandListener implements CommandExecutor {
 			if(args.length > 0) {
 				Player target = Bukkit.getPlayerExact(args[0]);
 				if( target == null  && args[0] != "-a") {
-					sender.sendMessage(String.format(I18nSupport.getInternationalisedString("That player could not be found")));
+					sender.sendMessage("That player could not be found");
 				} else {
 					if(!player.hasPermission("movecraft.commands.release.others")) {
-						player.sendMessage(String.format(I18nSupport.getInternationalisedString("You do not have permission to make others release")));
+						player.sendMessage("You do not have permission to make others release");
 					} else {
 						if (args[0] == "-a") {
 							for (Player p : Bukkit.getOnlinePlayers()) {
