@@ -166,6 +166,7 @@ public class Movecraft extends JavaPlugin {
 			Settings.SiegeControlRegion=new HashMap<String, String>();
 			Settings.SiegeDelay=new HashMap<String, Integer>();
 			Settings.SiegeDuration=new HashMap<String, Integer>();
+			Settings.SiegeDayOfTheWeek=new HashMap<String, Integer>();
 			for(String siegeName : siegesMap.keySet()) {
 				Settings.SiegeRegion.put(siegeName, (String)siegesMap.get(siegeName).get("SiegeRegion"));
 				Settings.SiegeCraftsToWin.put(siegeName, (ArrayList<String>)siegesMap.get(siegeName).get("CraftsToWin"));
@@ -177,6 +178,7 @@ public class Movecraft extends JavaPlugin {
 				Settings.SiegeControlRegion.put(siegeName, (String)siegesMap.get(siegeName).get("RegionToControl"));
 				Settings.SiegeDelay.put(siegeName, (Integer)siegesMap.get(siegeName).get("DelayBeforeStart"));
 				Settings.SiegeDuration.put(siegeName, (Integer)siegesMap.get(siegeName).get("SiegeDuration"));
+				Settings.SiegeDayOfTheWeek.put(siegeName, (Integer)siegesMap.get(siegeName).get("DayOfTheWeek"));
 			}
 			logger.log(Level.INFO, "Siege configuration loaded.");
 		}
