@@ -668,6 +668,9 @@ public class InteractListener implements Listener {
 				}
 			}
 		} else if (org.bukkit.ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("Status")) {
+			if (event.getPlayer().hasPermission("movecraft."
+					+ CraftManager.getInstance().getCraftByPlayer(event.getPlayer()).getType().getCraftName()
+					+ ".status" ))
 			if (CraftManager.getInstance().getCraftByPlayer(event.getPlayer()) != null) {
 				final Craft pCraft = CraftManager.getInstance().getCraftByPlayer(event.getPlayer());
 				Player pilot = event.getPlayer();
