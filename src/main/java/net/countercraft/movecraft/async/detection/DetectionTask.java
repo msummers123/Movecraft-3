@@ -74,12 +74,37 @@ public class DetectionTask extends AsyncTask {
 	TownyWorldHeightLimits townyWorldHeightLimits = null;
 
 	public DetectionTask(Craft c, MovecraftLocation startLocation, int minSize, int maxSize, Integer[] allowedBlocks,
-			Integer[] forbiddenBlocks, Player player, Player notificationPlayer, World w) {
+			Integer[] forbiddenBlocks, Player player, Player notificationPlayer, World w,
+			String[] forbiddenSignStrings) {
 		super(c);
 		this.startLocation = startLocation;
 		this.minSize = minSize;
 		this.maxSize = maxSize;
-		data = new DetectionTaskData(w, player, notificationPlayer, allowedBlocks, forbiddenBlocks);
+		data = new DetectionTaskData(w, player, notificationPlayer, allowedBlocks, forbiddenBlocks,
+				forbiddenSignStrings);
+
+		this.townyEnabled = Movecraft.getInstance().getTownyPlugin() != null;
+		if (townyEnabled && Settings.TownyBlockMoveOnSwitchPerm) {
+			this.townyWorld = TownyUtils.getTownyWorld(getCraft().getW());
+			if (townyWorld != null) {
+				this.townyEnabled = townyWorld.isUsingTowny();
+				if (townyEnabled)
+					townyWorldHeightLimits = TownyUtils.getWorldLimits(getCraft().getW());
+			}
+		} else {
+			this.townyEnabled = false;
+		}
+	}
+
+	public DetectionTask(Craft c, MovecraftLocation startLocation, int minSize, int maxSize, Integer[] allowedBlocks,
+			Integer[] forbiddenBlocks, String[] forbiddenSignStrings, Player player, Player notificationPlayer,
+			World w) {
+		super(c);
+		this.startLocation = startLocation;
+		this.minSize = minSize;
+		this.maxSize = maxSize;
+		data = new DetectionTaskData(w, player, notificationPlayer, allowedBlocks, forbiddenBlocks,
+				forbiddenSignStrings);
 
 		this.townyEnabled = Movecraft.getInstance().getTownyPlugin() != null;
 		if (townyEnabled && Settings.TownyBlockMoveOnSwitchPerm) {
@@ -153,159 +178,185 @@ public class DetectionTask extends AsyncTask {
 						if (s.getLine(1).equalsIgnoreCase(playerName) || s.getLine(2).equalsIgnoreCase(playerName)
 								|| s.getLine(3).equalsIgnoreCase(playerName)) {
 							foundPilot = true;
-						}
-						if (!foundPilot && (!data.getPlayer().hasPermission("movecraft.bypasslock"))) {
-							fail(String.format(I18nSupport
-									.getInternationalisedString("Not one of the registered pilots on this craft")));
-						}
-					}
-				}
+							if (testID == 63 || testID == 68) {
+								if (state instanceof Sign) {
+									for (int i = 0; i <= 4; i++) {
+										if (isForbiddenSignString(s.getLine(i))) {
+											fail(String.format(I18nSupport.getInternationalisedString(
+													"Detection - Forbidden sign string found")));
 
-				if (isForbiddenBlock(testID, testData)) {
-
-					fail(String.format(I18nSupport.getInternationalisedString("Detection - Forbidden block found")));
-
-				} else if (isAllowedBlock(testID, testData)) {
-					// check for double chests
-					if (testID == 54) {
-						boolean foundDoubleChest = false;
-						if (data.getWorld().getBlockTypeIdAt(x - 1, y, z) == 54) {
-							foundDoubleChest = true;
-						}
-						if (data.getWorld().getBlockTypeIdAt(x + 1, y, z) == 54) {
-							foundDoubleChest = true;
-						}
-						if (data.getWorld().getBlockTypeIdAt(x, y, z - 1) == 54) {
-							foundDoubleChest = true;
-						}
-						if (data.getWorld().getBlockTypeIdAt(x, y, z + 1) == 54) {
-							foundDoubleChest = true;
-						}
-						if (foundDoubleChest) {
-							fail(String.format(
-									I18nSupport.getInternationalisedString("Detection - ERROR: Double chest found")));
-						}
-					}
-					// check for double trapped chests
-					if (testID == 146) {
-						boolean foundDoubleChest = false;
-						if (data.getWorld().getBlockTypeIdAt(x - 1, y, z) == 146) {
-							foundDoubleChest = true;
-						}
-						if (data.getWorld().getBlockTypeIdAt(x + 1, y, z) == 146) {
-							foundDoubleChest = true;
-						}
-						if (data.getWorld().getBlockTypeIdAt(x, y, z - 1) == 146) {
-							foundDoubleChest = true;
-						}
-						if (data.getWorld().getBlockTypeIdAt(x, y, z + 1) == 146) {
-							foundDoubleChest = true;
-						}
-						if (foundDoubleChest) {
-							fail(String.format(
-									I18nSupport.getInternationalisedString("Detection - ERROR: Double chest found")));
-						}
-					}
-
-					Location loc = new Location(data.getWorld(), x, y, z);
-					Player p;
-					if (data.getPlayer() == null) {
-						p = data.getNotificationPlayer();
-					} else {
-						p = data.getPlayer();
-					}
-					if (p != null) {
-						if (Movecraft.getInstance().getWorldGuardPlugin() != null
-								&& Movecraft.getInstance().getWGCustomFlagsPlugin() != null
-								&& Settings.WGCustomFlagsUsePilotFlag) {
-							LocalPlayer lp = Movecraft.getInstance().getWorldGuardPlugin().wrapPlayer(p);
-							WGCustomFlagsUtils WGCFU = new WGCustomFlagsUtils();
-							if (!WGCFU.validateFlag(loc, Movecraft.FLAG_PILOT, lp)) {
-								fail(String.format(
-										I18nSupport.getInternationalisedString("WGCustomFlags - Detection Failed")
-												+ " @ %d,%d,%d",
-										x, y, z));
-							}
-						}
-
-						if (this.townyEnabled) {
-							TownBlock townBlock = TownyUtils.getTownBlock(loc);
-							if (townBlock != null && !this.townBlockSet.contains(townBlock)) {
-								if (TownyUtils.validateCraftMoveEvent(p, loc, this.townyWorld)) {
-									this.townBlockSet.add(townBlock);
-								} else {
-									int tY = loc.getBlockY();
-									boolean oChange = false;
-									if (this.craftMinY > tY) {
-										this.craftMinY = tY;
-										oChange = true;
+										}
 									}
-									if (this.craftMaxY < tY) {
-										this.craftMaxY = tY;
-										oChange = true;
+									if (s.getLine(0).equalsIgnoreCase("Pilot:") && data.getPlayer() != null) {
+										if (s.getLine(1).equalsIgnoreCase(playerName)
+												|| s.getLine(2).equalsIgnoreCase(playerName)
+												|| s.getLine(3).equalsIgnoreCase(playerName)) {
+											foundPilot = true;
+										}
+										if (!foundPilot && (!data.getPlayer().hasPermission("movecraft.bypasslock"))) {
+											fail(String.format(I18nSupport.getInternationalisedString(
+													"Not one of the registered pilots on this craft")));
+										}
 									}
-									if (oChange) {
-										boolean failed = false;
-										Town town = TownyUtils.getTown(townBlock);
-										if (town != null) {
-											Location locSpawn = TownyUtils.getTownSpawn(townBlock);
-											if (locSpawn != null) {
-												if (!this.townyWorldHeightLimits.validate(y, locSpawn.getBlockY())) {
-													failed = true;
-												}
-											} else {
-												failed = true;
+								}
+
+								if (isForbiddenBlock(testID, testData)) {
+
+									fail(String.format(I18nSupport
+											.getInternationalisedString("Detection - Forbidden block found")));
+
+								} else if (isAllowedBlock(testID, testData)) {
+									// check for double chests
+									if (testID == 54) {
+										boolean foundDoubleChest = false;
+										if (data.getWorld().getBlockTypeIdAt(x - 1, y, z) == 54) {
+											foundDoubleChest = true;
+										}
+										if (data.getWorld().getBlockTypeIdAt(x + 1, y, z) == 54) {
+											foundDoubleChest = true;
+										}
+										if (data.getWorld().getBlockTypeIdAt(x, y, z - 1) == 54) {
+											foundDoubleChest = true;
+										}
+										if (data.getWorld().getBlockTypeIdAt(x, y, z + 1) == 54) {
+											foundDoubleChest = true;
+										}
+										if (foundDoubleChest) {
+											fail(String.format(I18nSupport.getInternationalisedString(
+													"Detection - ERROR: Double chest found")));
+										}
+									}
+									// check for double trapped chests
+									if (testID == 146) {
+										boolean foundDoubleChest = false;
+										if (data.getWorld().getBlockTypeIdAt(x - 1, y, z) == 146) {
+											foundDoubleChest = true;
+										}
+										if (data.getWorld().getBlockTypeIdAt(x + 1, y, z) == 146) {
+											foundDoubleChest = true;
+										}
+										if (data.getWorld().getBlockTypeIdAt(x, y, z - 1) == 146) {
+											foundDoubleChest = true;
+										}
+										if (data.getWorld().getBlockTypeIdAt(x, y, z + 1) == 146) {
+											foundDoubleChest = true;
+										}
+										if (foundDoubleChest) {
+											fail(String.format(I18nSupport.getInternationalisedString(
+													"Detection - ERROR: Double chest found")));
+										}
+									}
+
+									Location loc = new Location(data.getWorld(), x, y, z);
+									Player p;
+									if (data.getPlayer() == null) {
+										p = data.getNotificationPlayer();
+									} else {
+										p = data.getPlayer();
+									}
+									if (p != null) {
+										if (Movecraft.getInstance().getWorldGuardPlugin() != null
+												&& Movecraft.getInstance().getWGCustomFlagsPlugin() != null
+												&& Settings.WGCustomFlagsUsePilotFlag) {
+											LocalPlayer lp = Movecraft.getInstance().getWorldGuardPlugin()
+													.wrapPlayer(p);
+											WGCustomFlagsUtils WGCFU = new WGCustomFlagsUtils();
+											if (!WGCFU.validateFlag(loc, Movecraft.FLAG_PILOT, lp)) {
+												fail(String.format(
+														I18nSupport.getInternationalisedString(
+																"WGCustomFlags - Detection Failed") + " @ %d,%d,%d",
+														x, y, z));
 											}
-											if (failed) {
-												if (Movecraft.getInstance().getWorldGuardPlugin() != null
-														&& Movecraft.getInstance().getWGCustomFlagsPlugin() != null
-														&& Settings.WGCustomFlagsUsePilotFlag) {
-													LocalPlayer lp = (LocalPlayer) Movecraft.getInstance()
-															.getWorldGuardPlugin().wrapPlayer(p);
-													ApplicableRegionSet regions = Movecraft.getInstance()
-															.getWorldGuardPlugin().getRegionManager(loc.getWorld())
-															.getApplicableRegions(loc);
-													if (regions.size() != 0) {
-														WGCustomFlagsUtils WGCFU = new WGCustomFlagsUtils();
-														if (WGCFU.validateFlag(loc, Movecraft.FLAG_PILOT, lp)) {
-															failed = false;
+										}
+
+										if (this.townyEnabled) {
+											TownBlock townBlock = TownyUtils.getTownBlock(loc);
+											if (townBlock != null && !this.townBlockSet.contains(townBlock)) {
+												if (TownyUtils.validateCraftMoveEvent(p, loc, this.townyWorld)) {
+													this.townBlockSet.add(townBlock);
+												} else {
+													int tY = loc.getBlockY();
+													boolean oChange = false;
+													if (this.craftMinY > tY) {
+														this.craftMinY = tY;
+														oChange = true;
+													}
+													if (this.craftMaxY < tY) {
+														this.craftMaxY = tY;
+														oChange = true;
+													}
+													if (oChange) {
+														boolean failed = false;
+														Town town = TownyUtils.getTown(townBlock);
+														if (town != null) {
+															Location locSpawn = TownyUtils.getTownSpawn(townBlock);
+															if (locSpawn != null) {
+																if (!this.townyWorldHeightLimits.validate(y,
+																		locSpawn.getBlockY())) {
+																	failed = true;
+																}
+															} else {
+																failed = true;
+															}
+															if (failed) {
+																if (Movecraft.getInstance()
+																		.getWorldGuardPlugin() != null
+																		&& Movecraft.getInstance()
+																				.getWGCustomFlagsPlugin() != null
+																		&& Settings.WGCustomFlagsUsePilotFlag) {
+																	LocalPlayer lp = (LocalPlayer) Movecraft
+																			.getInstance().getWorldGuardPlugin()
+																			.wrapPlayer(p);
+																	ApplicableRegionSet regions = Movecraft
+																			.getInstance().getWorldGuardPlugin()
+																			.getRegionManager(loc.getWorld())
+																			.getApplicableRegions(loc);
+																	if (regions.size() != 0) {
+																		WGCustomFlagsUtils WGCFU = new WGCustomFlagsUtils();
+																		if (WGCFU.validateFlag(loc,
+																				Movecraft.FLAG_PILOT, lp)) {
+																			failed = false;
+																		}
+																	}
+																}
+															}
+															if (failed) {
+																fail(String
+																		.format(I18nSupport.getInternationalisedString(
+																				"Towny - Detection Failed")
+																		+ " %s @ %d,%d,%d", town.getName(), x, y, z));
+															}
 														}
 													}
 												}
 											}
-											if (failed) {
-												fail(String.format(
-														I18nSupport.getInternationalisedString(
-																"Towny - Detection Failed") + " %s @ %d,%d,%d",
-														town.getName(), x, y, z));
-											}
 										}
 									}
+
+									addToBlockList(workingLocation);
+									Integer blockID = testID;
+									Integer dataID = testData;
+									Integer shiftedID = (blockID << 4) + dataID + 10000;
+									for (ArrayList<Integer> flyBlockDef : dFlyBlocks.keySet()) {
+										if (flyBlockDef.contains(blockID) || flyBlockDef.contains(shiftedID)) {
+											addToBlockCount(flyBlockDef);
+										} else {
+											addToBlockCount(null);
+										}
+									}
+
+									if (isWithinLimit(blockList.size(), 0, maxSize)) {
+
+										addToDetectionStack(workingLocation);
+
+										calculateBounds(workingLocation);
+
+									}
+
 								}
 							}
 						}
 					}
-
-					addToBlockList(workingLocation);
-					Integer blockID = testID;
-					Integer dataID = testData;
-					Integer shiftedID = (blockID << 4) + dataID + 10000;
-					for (ArrayList<Integer> flyBlockDef : dFlyBlocks.keySet()) {
-						if (flyBlockDef.contains(blockID) || flyBlockDef.contains(shiftedID)) {
-							addToBlockCount(flyBlockDef);
-						} else {
-							addToBlockCount(null);
-						}
-					}
-
-					if (isWithinLimit(blockList.size(), 0, maxSize)) {
-
-						addToDetectionStack(workingLocation);
-
-						calculateBounds(workingLocation);
-
-					}
-
 				}
 			}
 		}
@@ -327,6 +378,17 @@ public class DetectionTask extends AsyncTask {
 
 		for (int i : data.getForbiddenBlocks()) {
 			if ((i == test) || (i == (test << 4) + testData + 10000)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private boolean isForbiddenSignString(String testString) {
+
+		for (String s : data.getForbiddenSignStrings()) {
+			if (testString.equals(s)) {
 				return true;
 			}
 		}
