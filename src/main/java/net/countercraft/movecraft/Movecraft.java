@@ -167,6 +167,9 @@ public class Movecraft extends JavaPlugin {
 			Settings.SiegeDelay=new HashMap<String, Integer>();
 			Settings.SiegeDuration=new HashMap<String, Integer>();
 			Settings.SiegeDayOfTheWeek=new HashMap<String, Integer>();
+			Settings.SiegeCommandsOnStart=new HashMap<String, ArrayList<String>>();
+			Settings.SiegeCommandsOnWin=new HashMap<String, ArrayList<String>>();
+			Settings.SiegeCommandsOnLose=new HashMap<String, ArrayList<String>>();
 			for(String siegeName : siegesMap.keySet()) {
 				Settings.SiegeRegion.put(siegeName, (String)siegesMap.get(siegeName).get("SiegeRegion"));
 				Settings.SiegeCraftsToWin.put(siegeName, (ArrayList<String>)siegesMap.get(siegeName).get("CraftsToWin"));
@@ -179,6 +182,9 @@ public class Movecraft extends JavaPlugin {
 				Settings.SiegeDelay.put(siegeName, (Integer)siegesMap.get(siegeName).get("DelayBeforeStart"));
 				Settings.SiegeDuration.put(siegeName, (Integer)siegesMap.get(siegeName).get("SiegeDuration"));
 				Settings.SiegeDayOfTheWeek.put(siegeName, (Integer)siegesMap.get(siegeName).get("DayOfTheWeek"));
+				Settings.SiegeCommandsOnStart.put(siegeName, (ArrayList<String>)siegesMap.get(siegeName).get("SiegeCommandsOnStart"));
+				Settings.SiegeCommandsOnWin.put(siegeName, (ArrayList<String>)siegesMap.get(siegeName).get("SiegeCommandsOnWin"));
+				Settings.SiegeCommandsOnLose.put(siegeName, (ArrayList<String>)siegesMap.get(siegeName).get("SiegeCommandsOnLose"));
 			}
 			logger.log(Level.INFO, "Siege configuration loaded.");
 		}
