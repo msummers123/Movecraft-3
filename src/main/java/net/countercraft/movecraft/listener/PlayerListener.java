@@ -28,7 +28,6 @@ import net.countercraft.movecraft.localisation.I18nSupport;
 import net.countercraft.movecraft.utils.MathUtils;
 import net.countercraft.movecraft.utils.MovecraftLocation;
 
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -45,113 +44,113 @@ public class PlayerListener implements Listener {
 		String ret=null;
 		for(MovecraftLocation block : craftBlocks) {
 			int x,y,z;
-			x=block.getX()+1;
-			y=block.getY()+0;
-			z=block.getZ()+0;
+			x= block.x +1;
+			y= block.y +0;
+			z= block.z +0;
 			MovecraftLocation test=new MovecraftLocation(x,y,z);
 			if(!craftBlocks.contains(test))
 				if((Arrays.binarySearch(craft.getType().getAllowedBlocks(), craft.getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(craft.getType().getAllowedBlocks(), (craft.getW().getBlockTypeIdAt(x, y, z)<<4)+craft.getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
 					ret="@ "+x+","+y+","+z;
 				}
-			x=block.getX()-1;
-			y=block.getY()+0;
-			z=block.getZ()+0;
+			x= block.x -1;
+			y= block.y +0;
+			z= block.z +0;
 			test=new MovecraftLocation(x,y,z);
 			if(!craftBlocks.contains(test))
 				if((Arrays.binarySearch(craft.getType().getAllowedBlocks(), craft.getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(craft.getType().getAllowedBlocks(), (craft.getW().getBlockTypeIdAt(x, y, z)<<4)+craft.getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
 					ret="@ "+x+","+y+","+z;
 				}
-			x=block.getX()+0;
-			y=block.getY()+1;
-			z=block.getZ()+0;
+			x= block.x +0;
+			y= block.y +1;
+			z= block.z +0;
 			test=new MovecraftLocation(x,y,z);
 			if(!craftBlocks.contains(test))
 				if((Arrays.binarySearch(craft.getType().getAllowedBlocks(), craft.getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(craft.getType().getAllowedBlocks(), (craft.getW().getBlockTypeIdAt(x, y, z)<<4)+craft.getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
 					ret="@ "+x+","+y+","+z;
 				}
-			x=block.getX()+0;
-			y=block.getY()-1;
-			z=block.getZ()+0;
+			x= block.x +0;
+			y= block.y -1;
+			z= block.z +0;
 			test=new MovecraftLocation(x,y,z);
 			if(!craftBlocks.contains(test))
 				if((Arrays.binarySearch(craft.getType().getAllowedBlocks(), craft.getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(craft.getType().getAllowedBlocks(), (craft.getW().getBlockTypeIdAt(x, y, z)<<4)+craft.getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
 					ret="@ "+x+","+y+","+z;
 				}
-			x=block.getX()+0;
-			y=block.getY()+0;
-			z=block.getZ()+1;
+			x= block.x +0;
+			y= block.y +0;
+			z= block.z +1;
 			test=new MovecraftLocation(x,y,z);
 			if(!craftBlocks.contains(test))
 				if((Arrays.binarySearch(craft.getType().getAllowedBlocks(), craft.getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(craft.getType().getAllowedBlocks(), (craft.getW().getBlockTypeIdAt(x, y, z)<<4)+craft.getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
 					ret="@ "+x+","+y+","+z;
 				}
-			x=block.getX()+0;
-			y=block.getY()+0;
-			z=block.getZ()+1;
+			x= block.x +0;
+			y= block.y +0;
+			z= block.z +1;
 			test=new MovecraftLocation(x,y,z);
 			if(!craftBlocks.contains(test))
 				if((Arrays.binarySearch(craft.getType().getAllowedBlocks(), craft.getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(craft.getType().getAllowedBlocks(), (craft.getW().getBlockTypeIdAt(x, y, z)<<4)+craft.getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
 					ret="@ "+x+","+y+","+z;
 				}
-			x=block.getX()+1;
-			y=block.getY()+1;
-			z=block.getZ()+0;
+			x= block.x +1;
+			y= block.y +1;
+			z= block.z +0;
 			test=new MovecraftLocation(x,y,z);
 			if(!craftBlocks.contains(test))
 				if((Arrays.binarySearch(craft.getType().getAllowedBlocks(), craft.getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(craft.getType().getAllowedBlocks(), (craft.getW().getBlockTypeIdAt(x, y, z)<<4)+craft.getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
 					ret="@ "+x+","+y+","+z;
 				}
-			x=block.getX()+1;
-			y=block.getY()-1;
-			z=block.getZ()+0;
+			x= block.x +1;
+			y= block.y -1;
+			z= block.z +0;
 			test=new MovecraftLocation(x,y,z);
 			if(!craftBlocks.contains(test))
 				if((Arrays.binarySearch(craft.getType().getAllowedBlocks(), craft.getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(craft.getType().getAllowedBlocks(), (craft.getW().getBlockTypeIdAt(x, y, z)<<4)+craft.getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
 					ret="@ "+x+","+y+","+z;
 				}
-			x=block.getX()-1;
-			y=block.getY()+1;
-			z=block.getZ()+0;
+			x= block.x -1;
+			y= block.y +1;
+			z= block.z +0;
 			test=new MovecraftLocation(x,y,z);
 			if(!craftBlocks.contains(test))
 				if((Arrays.binarySearch(craft.getType().getAllowedBlocks(), craft.getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(craft.getType().getAllowedBlocks(), (craft.getW().getBlockTypeIdAt(x, y, z)<<4)+craft.getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
 					ret="@ "+x+","+y+","+z;
 				}
-			x=block.getX()-1;
-			y=block.getY()-1;
-			z=block.getZ()+0;
+			x= block.x -1;
+			y= block.y -1;
+			z= block.z +0;
 			test=new MovecraftLocation(x,y,z);
 			if(!craftBlocks.contains(test))
 				if((Arrays.binarySearch(craft.getType().getAllowedBlocks(), craft.getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(craft.getType().getAllowedBlocks(), (craft.getW().getBlockTypeIdAt(x, y, z)<<4)+craft.getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
 					ret="@ "+x+","+y+","+z;
 				}
-			x=block.getX()+0;
-			y=block.getY()+1;
-			z=block.getZ()+1;
+			x= block.x +0;
+			y= block.y +1;
+			z= block.z +1;
 			test=new MovecraftLocation(x,y,z);
 			if(!craftBlocks.contains(test))
 				if((Arrays.binarySearch(craft.getType().getAllowedBlocks(), craft.getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(craft.getType().getAllowedBlocks(), (craft.getW().getBlockTypeIdAt(x, y, z)<<4)+craft.getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
 					ret="@ "+x+","+y+","+z;
 				}
-			x=block.getX()+0;
-			y=block.getY()-1;
-			z=block.getZ()+1;
+			x= block.x +0;
+			y= block.y -1;
+			z= block.z +1;
 			test=new MovecraftLocation(x,y,z);
 			if(!craftBlocks.contains(test))
 				if((Arrays.binarySearch(craft.getType().getAllowedBlocks(), craft.getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(craft.getType().getAllowedBlocks(), (craft.getW().getBlockTypeIdAt(x, y, z)<<4)+craft.getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
 					ret="@ "+x+","+y+","+z;
 				}
-			x=block.getX()+0;
-			y=block.getY()+1;
-			z=block.getZ()-1;
+			x= block.x +0;
+			y= block.y +1;
+			z= block.z -1;
 			test=new MovecraftLocation(x,y,z);
 			if(!craftBlocks.contains(test))
 				if((Arrays.binarySearch(craft.getType().getAllowedBlocks(), craft.getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(craft.getType().getAllowedBlocks(), (craft.getW().getBlockTypeIdAt(x, y, z)<<4)+craft.getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
 					ret="@ "+x+","+y+","+z;
 				}
-			x=block.getX()+0;
-			y=block.getY()-1;
-			z=block.getZ()-1;
+			x= block.x +0;
+			y= block.y -1;
+			z= block.z -1;
 			test=new MovecraftLocation(x,y,z);
 			if(!craftBlocks.contains(test))
 				if((Arrays.binarySearch(craft.getType().getAllowedBlocks(), craft.getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(craft.getType().getAllowedBlocks(), (craft.getW().getBlockTypeIdAt(x, y, z)<<4)+craft.getW().getBlockAt(x, y, z).getData()+10000)>=0)) {

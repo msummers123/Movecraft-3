@@ -17,36 +17,12 @@
 
 package net.countercraft.movecraft.utils;
 
-public class MovecraftLocation {
-	private int x, y, z;
+public final class MovecraftLocation {
+	public final int x, y, z;
 
 	public MovecraftLocation( int x, int y, int z ) {
 		this.x = x;
 		this.y = y;
-		this.z = z;
-	}
-
-	public int getX() {
-		return x;
-	}
-
-	public void setX( int x ) {
-		this.x = x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	public void setY( int y ) {
-		this.y = y;
-	}
-
-	public int getZ() {
-		return z;
-	}
-
-	public void setZ( int z ) {
 		this.z = z;
 	}
 
@@ -68,12 +44,8 @@ public class MovecraftLocation {
 	public boolean equals(Object o) {
 		if(o instanceof MovecraftLocation){
 			MovecraftLocation location = (MovecraftLocation) o;
-			if(location.getX() == getX()){
-				if(location.getY() == getY()){
-					if(location.getZ() == getZ()){
-						return true;
-					}
-				}
+			if (location.x == x && location.y == y && location.z == z) {
+				return true;
 			}
 		}
 
@@ -88,11 +60,11 @@ public class MovecraftLocation {
 	}
 
 	public MovecraftLocation add( MovecraftLocation l ) {
-		return new MovecraftLocation( getX() + l.getX(), getY() + l.getY(), getZ() + l.getZ() );
+		return new MovecraftLocation( x + l.x, y + l.y, z + l.z);
 	}
 
 	public MovecraftLocation subtract( MovecraftLocation l ) {
-		return new MovecraftLocation( getX() - l.getX(), getY() - l.getY(), getZ() - l.getZ() );
+		return new MovecraftLocation( x - l.x, y - l.y, z - l.z);
 	}
 
 }

@@ -38,15 +38,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
-import org.mozilla.javascript.JavaScriptException;
 
 import at.pavlov.cannons.cannon.Cannon;
 
@@ -55,7 +50,6 @@ import com.palmergames.bukkit.towny.object.TownyWorld;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import java.util.ArrayList;
@@ -169,17 +163,17 @@ public class AsyncManager extends BukkitRunnable {
 										Integer parentMinX = null;
 										Integer parentMinZ = null;
 										for ( MovecraftLocation l : parentBlockList ) {
-											if ( parentMaxX == null || l.getX() > parentMaxX ) {
-												parentMaxX = l.getX();
+											if ( parentMaxX == null || l.x > parentMaxX ) {
+												parentMaxX = l.x;
 											}
-											if ( parentMaxZ == null || l.getZ() > parentMaxZ ) {
-												parentMaxZ = l.getZ();
+											if ( parentMaxZ == null || l.z > parentMaxZ ) {
+												parentMaxZ = l.z;
 											}
-											if ( parentMinX == null || l.getX() < parentMinX ) {
-												parentMinX = l.getX();
+											if ( parentMinX == null || l.x < parentMinX ) {
+												parentMinX = l.x;
 											}
-											if ( parentMinZ == null || l.getZ() < parentMinZ ) {
-												parentMinZ = l.getZ();
+											if ( parentMinZ == null || l.z < parentMinZ ) {
+												parentMinZ = l.z;
 											}
 										}
 										int parentSizeX, parentSizeZ;
@@ -187,22 +181,22 @@ public class AsyncManager extends BukkitRunnable {
 										parentSizeZ = ( parentMaxZ - parentMinZ ) + 1;
 										int[][][] parentPolygonalBox = new int[parentSizeX][][];
 										for ( MovecraftLocation l : parentBlockList ) {
-											if ( parentPolygonalBox[l.getX() - parentMinX] == null ) {
-												parentPolygonalBox[l.getX() - parentMinX] = new int[parentSizeZ][];
+											if ( parentPolygonalBox[l.x - parentMinX] == null ) {
+												parentPolygonalBox[l.x - parentMinX] = new int[parentSizeZ][];
 											}
-											if ( parentPolygonalBox[l.getX() - parentMinX][l.getZ() - parentMinZ] == null ) {
-												parentPolygonalBox[l.getX() - parentMinX][l.getZ() - parentMinZ] = new int[2];
-												parentPolygonalBox[l.getX() - parentMinX][l.getZ() - parentMinZ][0] = l.getY();
-												parentPolygonalBox[l.getX() - parentMinX][l.getZ() - parentMinZ][1] = l.getY();
+											if ( parentPolygonalBox[l.x - parentMinX][l.z - parentMinZ] == null ) {
+												parentPolygonalBox[l.x - parentMinX][l.z - parentMinZ] = new int[2];
+												parentPolygonalBox[l.x - parentMinX][l.z - parentMinZ][0] = l.y;
+												parentPolygonalBox[l.x - parentMinX][l.z - parentMinZ][1] = l.y;
 											} else {
-												int parentMinY = parentPolygonalBox[l.getX() - parentMinX][l.getZ() - parentMinZ][0];
-												int parentMaxY = parentPolygonalBox[l.getX() - parentMinX][l.getZ() - parentMinZ][1];
+												int parentMinY = parentPolygonalBox[l.x - parentMinX][l.z - parentMinZ][0];
+												int parentMaxY = parentPolygonalBox[l.x - parentMinX][l.z - parentMinZ][1];
 
-												if ( l.getY() < parentMinY ) {
-													parentPolygonalBox[l.getX() - parentMinX][l.getZ() - parentMinZ][0] = l.getY();
+												if ( l.y < parentMinY ) {
+													parentPolygonalBox[l.x - parentMinX][l.z - parentMinZ][0] = l.y;
 												}
-												if ( l.getY() > parentMaxY ) {
-													parentPolygonalBox[l.getX() - parentMinX][l.getZ() - parentMinZ][1] = l.getY();
+												if ( l.y > parentMaxY ) {
+													parentPolygonalBox[l.x - parentMinX][l.z - parentMinZ][1] = l.y;
 												}
 											}
 										}
@@ -270,7 +264,7 @@ public class AsyncManager extends BukkitRunnable {
 							// convert blocklist to location list
 							List<Location> shipLocations=new ArrayList<Location>();
 							for(MovecraftLocation loc : c.getBlockList()) {
-								Location tloc=new Location(c.getW(),loc.getX(),loc.getY(),loc.getZ());
+								Location tloc=new Location(c.getW(), loc.x, loc.y, loc.z);
 								shipLocations.add(tloc);
 							}
 							shipCannons=Movecraft.getInstance().getCannonsPlugin().getCannonsAPI().getCannons(shipLocations, c.getNotificationPlayer().getUniqueId(), true);
@@ -327,7 +321,7 @@ public class AsyncManager extends BukkitRunnable {
 							// convert blocklist to location list
 							List<Location> shipLocations=new ArrayList<Location>();
 							for(MovecraftLocation loc : c.getBlockList()) {
-								Location tloc=new Location(c.getW(),loc.getX(),loc.getY(),loc.getZ());
+								Location tloc=new Location(c.getW(), loc.x, loc.y, loc.z);
 								shipLocations.add(tloc);
 							}
 							shipCannons=Movecraft.getInstance().getCannonsPlugin().getCannonsAPI().getCannons(shipLocations, c.getNotificationPlayer().getUniqueId(), true);
@@ -345,7 +339,7 @@ public class AsyncManager extends BukkitRunnable {
 
 							// rotate any cannons that were present
 							if( Movecraft.getInstance().getCannonsPlugin()!=null && shipCannons!=null) {
-								Location tloc=new Location(task.getCraft().getW(),task.getOriginPoint().getX(),task.getOriginPoint().getY(),task.getOriginPoint().getZ());
+								Location tloc=new Location(task.getCraft().getW(), task.getOriginPoint().x, task.getOriginPoint().y, task.getOriginPoint().z);
 								for(Cannon can : shipCannons) {
 									if(task.getRotation()==net.countercraft.movecraft.utils.Rotation.CLOCKWISE)
 										can.rotateRight(tloc.toVector());
@@ -506,8 +500,8 @@ public class AsyncManager extends BukkitRunnable {
 			return false;
 		if(Settings.WorldGuardBlockSinkOnPVPPerm==false)
 			return false;
-		 
-		Location nativeLoc=new Location(w, loc.getX(), loc.getY(), loc.getZ());
+
+		Location nativeLoc=new Location(w, loc.x, loc.y, loc.z);
 		ApplicableRegionSet set = Movecraft.getInstance().getWorldGuardPlugin().getRegionManager(w).getApplicableRegions(nativeLoc);
 		if(set.allows(DefaultFlag.PVP)==false) {
 			return true;
@@ -517,7 +511,7 @@ public class AsyncManager extends BukkitRunnable {
 	
         private boolean isRegionFlagSinkAllowed(MovecraftLocation loc,World w) {
             if(Movecraft.getInstance().getWorldGuardPlugin()!=null && Movecraft.getInstance().getWGCustomFlagsPlugin()!= null && Settings.WGCustomFlagsUseSinkFlag){
-                Location nativeLoc=new Location(w, loc.getX(), loc.getY(), loc.getZ());
+				Location nativeLoc=new Location(w, loc.x, loc.y, loc.z);
                 WGCustomFlagsUtils WGCFU = new WGCustomFlagsUtils();
                 return WGCFU.validateFlag(nativeLoc,Movecraft.FLAG_SINK);
             }else{
@@ -526,7 +520,7 @@ public class AsyncManager extends BukkitRunnable {
 	}
         
         private Location isTownyPlotPVPEnabled(MovecraftLocation loc,World w, Set<TownBlock> townBlockSet){
-            Location plugLoc=new Location(w, loc.getX(), loc.getY(), loc.getZ());
+			Location plugLoc=new Location(w, loc.x, loc.y, loc.z);
             TownBlock townBlock = TownyUtils.getTownBlock(plugLoc);
             if (townBlock != null && !townBlockSet.contains(townBlock)){
                 if (TownyUtils.validatePVP(townBlock)){
@@ -577,9 +571,9 @@ public class AsyncManager extends BukkitRunnable {
                                                                             if (townyLoc != null){
                                                                                 sinkingForbiddenByTowny = true;
                                                                             }
-                                                                        } 
-									Integer blockID=w.getBlockAt(l.getX(), l.getY(), l.getZ()).getTypeId();
-									Integer dataID=(int)w.getBlockAt(l.getX(), l.getY(), l.getZ()).getData();
+                                                                        }
+									Integer blockID=w.getBlockAt(l.x, l.y, l.z).getTypeId();
+									Integer dataID=(int)w.getBlockAt(l.x, l.y, l.z).getData();
 									Integer shiftedID=(blockID<<4)+dataID+10000;
 									for(ArrayList<Integer> flyBlockDef : pcraft.getType().getFlyBlocks().keySet()) {
 										if(flyBlockDef.contains(blockID) || flyBlockDef.contains(shiftedID)) {
@@ -879,13 +873,13 @@ public class AsyncManager extends BukkitRunnable {
 								// has enough time passed to fade the block?
 								if(secsElapsed>Settings.FadeWrecksAfter) {
 									// load the chunk if it hasn't been already
-									int cx=loc.getX()>>4;
-									int cz=loc.getZ()>>4;
+									int cx= loc.x >>4;
+									int cz= loc.z >>4;
 									if(w.isChunkLoaded(cx, cz) == false) {
 										w.loadChunk(cx, cz);
 									}
 									// check to see if the block type has changed, if so don't fade it
-									if(w.getBlockTypeIdAt( loc.getX(), loc.getY(), loc.getZ())==Movecraft.getInstance().blockFadeTypeMap.get(loc)) {
+									if(w.getBlockTypeIdAt(loc.x, loc.y, loc.z)==Movecraft.getInstance().blockFadeTypeMap.get(loc)) {
 										// should it become water? if not, then air
 										if(Movecraft.getInstance().blockFadeWaterMap.get(loc)==true) {
 											MapUpdateCommand updateCom=new MapUpdateCommand(loc,9,(byte)0,null);
