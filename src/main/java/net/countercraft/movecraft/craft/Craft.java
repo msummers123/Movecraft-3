@@ -141,10 +141,10 @@ public class Craft {
 		if(dz<0)
 			cminZ=cminZ+dz;
 		for(MovecraftLocation m : blockList) {
-			if(m.getX()>cmaxX)
-				cmaxX=m.getX();
-			if(m.getZ()>cmaxZ)
-				cmaxZ=m.getZ();
+			if(m.x >cmaxX)
+				cmaxX= m.x;
+			if(m.z >cmaxZ)
+				cmaxZ= m.z;
 		}
 		if(dx>0)
 			cmaxX=cmaxX+dx;
@@ -169,9 +169,9 @@ public class Craft {
 	
 	public void resetSigns( boolean resetCruise, boolean resetAscend, boolean resetDescend) {
 		for ( int i = 0; i < blockList.length; i++ ) {
-			int blockID=w.getBlockAt(blockList[i].getX(), blockList[i].getY(), blockList[i].getZ() ).getTypeId();
+			int blockID=w.getBlockAt(blockList[i].x, blockList[i].y, blockList[i].z).getTypeId();
 			if(blockID==63 || blockID==68) {
-				Sign s=(Sign) w.getBlockAt(blockList[i].getX(), blockList[i].getY(), blockList[i].getZ() ).getState();
+				Sign s=(Sign) w.getBlockAt(blockList[i].x, blockList[i].y, blockList[i].z).getState();
 				if(resetCruise)
 					if ( org.bukkit.ChatColor.stripColor(s.getLine( 0 )).equals( "Cruise: ON")) {
 						s.setLine(0, "Cruise: OFF");
@@ -198,10 +198,10 @@ public class Craft {
 		int cminZ=minZ;
 		int cmaxZ=minZ;
 		for(MovecraftLocation m : blockList) {
-			if(m.getX()>cmaxX)
-				cmaxX=m.getX();
-			if(m.getZ()>cmaxZ)
-				cmaxZ=m.getZ();
+			if(m.x >cmaxX)
+				cmaxX= m.x;
+			if(m.z >cmaxZ)
+				cmaxZ= m.z;
 		}
 		int distX=cmaxX-cminX;
 		int distZ=cmaxZ-cminZ;

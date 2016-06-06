@@ -23,20 +23,20 @@ public class MathUtils {
 
 	public static boolean playerIsWithinBoundingPolygon( int[][][] box, int minX, int minZ, MovecraftLocation l ) {
 
-		if ( l.getX() >= minX && l.getX() < ( minX + box.length ) ) {
+		if ( l.x >= minX && l.x < ( minX + box.length ) ) {
 			// PLayer is within correct X boundary
-			if ( l.getZ() >= minZ && l.getZ() < ( minZ + box[l.getX() - minX].length ) ) {
+			if ( l.z >= minZ && l.z < ( minZ + box[l.x - minX].length ) ) {
 				// Player is within valid Z boundary
 				int minY, maxY;
 
 				try {
-					minY = box[l.getX() - minX][l.getZ() - minZ][0];
-					maxY = box[l.getX() - minX][l.getZ() - minZ][1];
+					minY = box[l.x - minX][l.z - minZ][0];
+					maxY = box[l.x - minX][l.z - minZ][1];
 				} catch ( NullPointerException e ) {
 					return false;
 				}
 
-				if ( l.getY() >= minY && l.getY() <= ( maxY + 2 ) ) {
+				if ( l.y >= minY && l.y <= ( maxY + 2 ) ) {
 					// Player is on board the vessel
 					return true;
 				}
@@ -54,7 +54,6 @@ public class MathUtils {
 	}
 
 	public static MovecraftLocation rotateVec( Rotation r, MovecraftLocation l ) {
-		MovecraftLocation newLocation = new MovecraftLocation( 0, l.getY(), 0 );
 		double theta;
 		if ( r == Rotation.CLOCKWISE ) {
 			theta = 0.5 * Math.PI;
@@ -62,13 +61,10 @@ public class MathUtils {
 			theta = -1 * 0.5 * Math.PI;
 		}
 
-		int x = ( int ) Math.round( ( l.getX() * Math.cos( theta ) ) + ( l.getZ() * ( -1 * Math.sin( theta ) ) ) );
-		int z = ( int ) Math.round( ( l.getX() * Math.sin( theta ) ) + ( l.getZ() * Math.cos( theta ) ) );
+		int x = ( int ) Math.round( ( l.x * Math.cos( theta ) ) + ( l.z * ( -1 * Math.sin( theta ) ) ) );
+		int z = ( int ) Math.round( ( l.x * Math.sin( theta ) ) + ( l.z * Math.cos( theta ) ) );
 
-		newLocation.setX( x );
-		newLocation.setZ( z );
-
-		return newLocation;
+		return new MovecraftLocation(x, l.y, z);
 	}
 
 	public static double[] rotateVec( Rotation r, double x, double z ) {

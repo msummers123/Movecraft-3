@@ -22,7 +22,6 @@ import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownyWorld;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.StateFlag;
 
 import net.countercraft.movecraft.async.AsyncTask;
 import net.countercraft.movecraft.craft.Craft;
@@ -340,9 +339,9 @@ public class DetectionTask extends AsyncTask {
 	}
 
 	private void detectSurrounding( MovecraftLocation l ) {
-		int x = l.getX();
-		int y = l.getY();
-		int z = l.getZ();
+		int x = l.x;
+		int y = l.y;
+		int z = l.z;
 
 		for ( int xMod = -1; xMod < 2; xMod += 2 ) {
 
@@ -373,23 +372,23 @@ public class DetectionTask extends AsyncTask {
 	}
 
 	private void calculateBounds( MovecraftLocation l ) {
-		if ( maxX == null || l.getX() > maxX ) {
-			maxX = l.getX();
+		if ( maxX == null || l.x > maxX ) {
+			maxX = l.x;
 		}
-		if ( maxY == null || l.getY() > maxY ) {
-			maxY = l.getY();
+		if ( maxY == null || l.y > maxY ) {
+			maxY = l.y;
 		}
-		if ( maxZ == null || l.getZ() > maxZ ) {
-			maxZ = l.getZ();
+		if ( maxZ == null || l.z > maxZ ) {
+			maxZ = l.z;
 		}
-		if ( data.getMinX() == null || l.getX() < data.getMinX() ) {
-			data.setMinX( l.getX() );
+		if ( data.getMinX() == null || l.x < data.getMinX() ) {
+			data.setMinX(l.x);
 		}
-		if ( minY == null || l.getY() < minY ) {
-			minY = l.getY();
+		if ( minY == null || l.y < minY ) {
+			minY = l.y;
 		}
-		if ( data.getMinZ() == null || l.getZ() < data.getMinZ() ) {
-			data.setMinZ( l.getZ() );
+		if ( data.getMinZ() == null || l.z < data.getMinZ() ) {
+			data.setMinZ(l.z);
 		}
 	}
 

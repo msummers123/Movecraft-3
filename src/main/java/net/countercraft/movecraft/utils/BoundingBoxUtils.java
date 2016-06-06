@@ -26,27 +26,27 @@ public class BoundingBoxUtils {
 		int[][][] polygonalBox = new int[sizeX][][];
 
 		for ( MovecraftLocation l : blockList ) {
-			if ( polygonalBox[l.getX() - minX] == null ) {
-				polygonalBox[l.getX() - minX] = new int[sizeZ][];
+			if ( polygonalBox[l.x - minX] == null ) {
+				polygonalBox[l.x - minX] = new int[sizeZ][];
 			}
 
 			int minY, maxY;
 
-			if ( polygonalBox[l.getX() - minX][l.getZ() - minZ] == null ) {
+			if ( polygonalBox[l.x - minX][l.z - minZ] == null ) {
 
-				polygonalBox[l.getX() - minX][l.getZ() - minZ] = new int[2];
-				polygonalBox[l.getX() - minX][l.getZ() - minZ][0] = l.getY();
-				polygonalBox[l.getX() - minX][l.getZ() - minZ][1] = l.getY();
+				polygonalBox[l.x - minX][l.z - minZ] = new int[2];
+				polygonalBox[l.x - minX][l.z - minZ][0] = l.y;
+				polygonalBox[l.x - minX][l.z - minZ][1] = l.y;
 
 			} else {
-				minY = polygonalBox[l.getX() - minX][l.getZ() - minZ][0];
-				maxY = polygonalBox[l.getX() - minX][l.getZ() - minZ][1];
+				minY = polygonalBox[l.x - minX][l.z - minZ][0];
+				maxY = polygonalBox[l.x - minX][l.z - minZ][1];
 
-				if ( l.getY() < minY ) {
-					polygonalBox[l.getX() - minX][l.getZ() - minZ][0] = l.getY();
+				if ( l.y < minY ) {
+					polygonalBox[l.x - minX][l.z - minZ][0] = l.y;
 				}
-				if ( l.getY() > maxY ) {
-					polygonalBox[l.getX() - minX][l.getZ() - minZ][1] = l.getY();
+				if ( l.y > maxY ) {
+					polygonalBox[l.x - minX][l.z - minZ][1] = l.y;
 				}
 
 			}

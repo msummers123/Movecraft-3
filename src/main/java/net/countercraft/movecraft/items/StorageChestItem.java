@@ -93,7 +93,7 @@ public class StorageChestItem {
 					}
 				}
 
-				String key = w.getName() + " " + l.getX() + " " + l.getY() + " " + l.getZ();
+				String key = w.getName() + " " + l.x + " " + l.y + " " + l.z;
 				data.put( key, cardboardBoxes );
 			}
 		}
