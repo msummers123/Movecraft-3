@@ -31,9 +31,6 @@ import net.countercraft.movecraft.utils.datastructures.CommandBlockTransferHolde
 import net.countercraft.movecraft.utils.datastructures.StorageCrateTransferHolder;
 import net.countercraft.movecraft.utils.datastructures.TransferData;
 import net.minecraft.server.v1_9_R1.BlockPosition;
-import net.minecraft.server.v1_9_R1.ChunkCoordIntPair;
-import net.minecraft.server.v1_9_R1.EnumSkyBlock;
-import net.minecraft.server.v1_9_R1.IBlockData;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -41,24 +38,18 @@ import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.craftbukkit.v1_9_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_9_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Vector;
 
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.blocks.SignBlock;
@@ -69,10 +60,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.*;
 import java.util.logging.Level;
-
-import net.minecraft.server.v1_9_R1.EntityTNTPrimed;
-
-import org.bukkit.event.entity.ExplosionPrimeEvent;
 
 public class MapUpdateManager extends BukkitRunnable {
 	private final HashMap<World, ArrayList<MapUpdateCommand>> updates = new HashMap<World, ArrayList<MapUpdateCommand>>();
@@ -92,11 +79,11 @@ public class MapUpdateManager extends BukkitRunnable {
 	
 	private void updateBlock(MapUpdateCommand m, World w, Map<MovecraftLocation, TransferData> dataMap, Set<net.minecraft.server.v1_9_R1.Chunk> chunks, Set<Chunk> cmChunks, HashMap<MovecraftLocation, Byte> origLightMap, boolean placeDispensers) {
 		MovecraftLocation workingL = m.getNewBlockLocation();
-		final int[] blocksToBlankOut = new int[]{ 54, 61, 62, 63, 68, 116, 117, 146, 149, 150, 154, 158, 145 };		
+		final int[] blocksToBlankOut = new int[]{ 54, 61, 62, 63, 68, 116, 117, 146, 149, 150, 154, 158, 145 };
 
-		int x = workingL.getX();
-		int y = workingL.getY();
-		int z = workingL.getZ();
+		int x = workingL.x;
+		int y = workingL.y;
+		int z = workingL.z;
 		Chunk chunk=null;
 
 		int newTypeID = m.getTypeID();
@@ -271,7 +258,7 @@ public class MapUpdateManager extends BukkitRunnable {
 				if ( transferData instanceof SignTransferHolder ) {
 	
 					SignTransferHolder signData = ( SignTransferHolder ) transferData;
-					BlockState bs=w.getBlockAt( l.getX(), l.getY(), l.getZ() ).getState();
+					BlockState bs=w.getBlockAt(l.x, l.y, l.z).getState();
 					if(bs instanceof Sign) {
 						Sign sign = ( Sign ) bs;
 						for ( int i = 0; i < signData.getLines().length; i++ ) {
@@ -314,16 +301,16 @@ public class MapUpdateManager extends BukkitRunnable {
 	
 				} else if ( transferData instanceof InventoryTransferHolder ) {
 					InventoryTransferHolder invData = ( InventoryTransferHolder ) transferData;
-					InventoryHolder inventoryHolder = ( InventoryHolder ) w.getBlockAt( l.getX(), l.getY(), l.getZ() ).getState();
+					InventoryHolder inventoryHolder = ( InventoryHolder ) w.getBlockAt(l.x, l.y, l.z).getState();
 					inventoryHolder.getInventory().setContents( invData.getInvetory() );
 				} else if ( transferData instanceof CommandBlockTransferHolder) {
 					CommandBlockTransferHolder cbData=(CommandBlockTransferHolder) transferData;
-					CommandBlock cblock=(CommandBlock) w.getBlockAt( l.getX(), l.getY(), l.getZ() ).getState();
+					CommandBlock cblock=(CommandBlock) w.getBlockAt(l.x, l.y, l.z).getState();
 					cblock.setCommand(cbData.getText());
 					cblock.setName(cbData.getName());
 					cblock.update();
 				}
-				w.getBlockAt( l.getX(), l.getY(), l.getZ() ).setData( transferData.getData() );
+				w.getBlockAt(l.x, l.y, l.z).setData( transferData.getData() );
 			} catch ( IndexOutOfBoundsException e ) {
 				Movecraft.getInstance().getLogger().log( Level.SEVERE, "Severe error in map updater" );
 			} catch (IllegalArgumentException e) {
@@ -386,7 +373,7 @@ public class MapUpdateManager extends BukkitRunnable {
 			if(Settings.CompatibilityMode==false) {
 				// send updates to client
 				for ( MapUpdateCommand c : updatesInWorld ) {
-					Location loc=new Location(w,c.getNewBlockLocation().getX(),c.getNewBlockLocation().getY(),c.getNewBlockLocation().getZ());
+					Location loc=new Location(w, c.getNewBlockLocation().x, c.getNewBlockLocation().y, c.getNewBlockLocation().z);
 					w.getBlockAt(loc).getState().update();
 				}
 //				for ( net.minecraft.server.v1_8_R3.Chunk c : chunks ) {
@@ -457,16 +444,16 @@ public class MapUpdateManager extends BukkitRunnable {
 					
 					if ( l != null ) {
 						// keep track of the light levels that were present before moving the craft
-						origLightMap.put(l, w.getBlockAt(l.getX(), l.getY(), l.getZ()).getLightLevel());
+						origLightMap.put(l, w.getBlockAt(l.x, l.y, l.z).getLightLevel());
 						
 						// keep track of block data for later reconstruction
-						TransferData blockDataPacket = getBlockDataPacket( w.getBlockAt( l.getX(), l.getY(), l.getZ() ).getState(), c.getRotation() );
+						TransferData blockDataPacket = getBlockDataPacket( w.getBlockAt(l.x, l.y, l.z).getState(), c.getRotation() );
 						if ( blockDataPacket != null ) {
 							dataMap.put( c.getNewBlockLocation(), blockDataPacket );
 						}
 						
 						//remove dispensers and replace them with half slabs to prevent them firing during reconstruction
-						if(w.getBlockAt( l.getX(), l.getY(), l.getZ() ).getTypeId()==23) {
+						if(w.getBlockAt(l.x, l.y, l.z).getTypeId()==23) {
 							MapUpdateCommand blankCommand=new MapUpdateCommand(c.getOldBlockLocation(), 23, c.getDataID(), c.getCraft());
 //							if(Settings.CompatibilityMode) {
 								queuedMapUpdateCommands.add(blankCommand);
@@ -475,7 +462,7 @@ public class MapUpdateManager extends BukkitRunnable {
 //								updateBlock(blankCommand, w, dataMap, chunks, cmChunks, origLightMap, false);
 						}
 						//remove redstone blocks and replace them with stone to prevent redstone activation during reconstruction
-						if(w.getBlockAt( l.getX(), l.getY(), l.getZ() ).getTypeId()==152) {
+						if(w.getBlockAt(l.x, l.y, l.z).getTypeId()==152) {
 							MapUpdateCommand blankCommand=new MapUpdateCommand(c.getOldBlockLocation(), 1, (byte)0, c.getCraft());
 //							if(Settings.CompatibilityMode) {
 								queuedMapUpdateCommands.add(blankCommand);
@@ -484,7 +471,7 @@ public class MapUpdateManager extends BukkitRunnable {
 //								updateBlock(blankCommand, w, dataMap, chunks, cmChunks, origLightMap, false);
 						}
 						//remove water and lava blocks and replace them with stone to prevent spillage during reconstruction
-						if(w.getBlockAt( l.getX(), l.getY(), l.getZ() ).getTypeId()>=8 && w.getBlockAt( l.getX(), l.getY(), l.getZ() ).getTypeId()<=11) {
+						if(w.getBlockAt(l.x, l.y, l.z).getTypeId()>=8 && w.getBlockAt(l.x, l.y, l.z).getTypeId()<=11) {
 							MapUpdateCommand blankCommand=new MapUpdateCommand(c.getOldBlockLocation(), 0, (byte)0, c.getCraft());
 							updateBlock(blankCommand, w, dataMap, chunks, cmChunks, origLightMap, false);
 						}
@@ -508,12 +495,12 @@ public class MapUpdateManager extends BukkitRunnable {
 								// send the blocks around the player first
 								Player p=(Player)i.getEntity();
 								for ( MapUpdateCommand muc : updatesInWorld ) {
-									int disty=Math.abs(muc.getNewBlockLocation().getY()-i.getNewLocation().getBlockY());
-									int distx=Math.abs(muc.getNewBlockLocation().getX()-i.getNewLocation().getBlockX());
-									int distz=Math.abs(muc.getNewBlockLocation().getZ()-i.getNewLocation().getBlockZ());
+									int disty=Math.abs(muc.getNewBlockLocation().y -i.getNewLocation().getBlockY());
+									int distx=Math.abs(muc.getNewBlockLocation().x -i.getNewLocation().getBlockX());
+									int distz=Math.abs(muc.getNewBlockLocation().z -i.getNewLocation().getBlockZ());
 									if(disty<2 && distx<2 && distz<2) {
 										updateBlock(muc, w, dataMap, chunks, cmChunks, origLightMap, false);
-										Location nloc=new Location(w, muc.getNewBlockLocation().getX(), muc.getNewBlockLocation().getY(), muc.getNewBlockLocation().getZ());
+										Location nloc=new Location(w, muc.getNewBlockLocation().x, muc.getNewBlockLocation().y, muc.getNewBlockLocation().z);
 										p.sendBlockChange(nloc, muc.getTypeID(), muc.getDataID());
 									}
 								}
@@ -527,7 +514,7 @@ public class MapUpdateManager extends BukkitRunnable {
 				for ( MapUpdateCommand i : updatesInWorld ) {
 					if(i!=null) {
 						if(i.getTypeID()>=0) {
-							int prevType=w.getBlockAt(i.getNewBlockLocation().getX(), i.getNewBlockLocation().getY(), i.getNewBlockLocation().getZ()).getTypeId();
+							int prevType=w.getBlockAt(i.getNewBlockLocation().x, i.getNewBlockLocation().y, i.getNewBlockLocation().z).getTypeId();
 							boolean prevIsFragile=(Arrays.binarySearch(fragileBlocks,prevType)>=0);
 							boolean isFragile=(Arrays.binarySearch(fragileBlocks,i.getTypeID())>=0);
 							if(prevIsFragile && (!isFragile)) {
@@ -560,7 +547,7 @@ public class MapUpdateManager extends BukkitRunnable {
 								if(m.getTypeID()<-10) { // don't bother with tiny explosions
 									float explosionPower=m.getTypeID();
 									explosionPower=0.0F-explosionPower/100.0F;
-                                                                        Location loc = new Location(w, m.getNewBlockLocation().getX()+0.5, m.getNewBlockLocation().getY()+0.5, m.getNewBlockLocation().getZ());
+									Location loc = new Location(w, m.getNewBlockLocation().x +0.5, m.getNewBlockLocation().y +0.5, m.getNewBlockLocation().z);
                                                                         this.createExplosion(loc, explosionPower);
 									//w.createExplosion(m.getNewBlockLocation().getX()+0.5, m.getNewBlockLocation().getY()+0.5, m.getNewBlockLocation().getZ()+0.5, explosionPower);
 								}
@@ -671,7 +658,7 @@ public class MapUpdateManager extends BukkitRunnable {
 				for ( MapUpdateCommand i : updatesInWorld ) {
 					if(i!=null) {
 						if(i.getSmoke()==1) {
-							Location loc=new Location(w, i.getNewBlockLocation().getX(), i.getNewBlockLocation().getY(),  i.getNewBlockLocation().getZ());
+							Location loc=new Location(w, i.getNewBlockLocation().x, i.getNewBlockLocation().y, i.getNewBlockLocation().z);
 							w.playEffect(loc, Effect.SMOKE, 4);
 						}
 					}
@@ -781,18 +768,18 @@ public class MapUpdateManager extends BukkitRunnable {
 					return true;
 				}
 				if(m!=null) {
-					if(m.getNewBlockLocation().getX()<minx)
-						minx=m.getNewBlockLocation().getX();
-					if(m.getNewBlockLocation().getY()<miny)
-						miny=m.getNewBlockLocation().getY();
-					if(m.getNewBlockLocation().getZ()<minz)
-						minz=m.getNewBlockLocation().getZ();
-					if(m.getNewBlockLocation().getX()>maxx)
-						maxx=m.getNewBlockLocation().getX();
-					if(m.getNewBlockLocation().getY()>maxy)
-						maxy=m.getNewBlockLocation().getY();
-					if(m.getNewBlockLocation().getZ()>maxz)
-						maxz=m.getNewBlockLocation().getZ();
+					if(m.getNewBlockLocation().x <minx)
+						minx= m.getNewBlockLocation().x;
+					if(m.getNewBlockLocation().y <miny)
+						miny= m.getNewBlockLocation().y;
+					if(m.getNewBlockLocation().z <minz)
+						minz= m.getNewBlockLocation().z;
+					if(m.getNewBlockLocation().x >maxx)
+						maxx= m.getNewBlockLocation().x;
+					if(m.getNewBlockLocation().y >maxy)
+						maxy= m.getNewBlockLocation().y;
+					if(m.getNewBlockLocation().z >maxz)
+						maxz= m.getNewBlockLocation().z;
 					sortRef.put(m.getNewBlockLocation(), m);
 				}
 			}
@@ -804,7 +791,7 @@ public class MapUpdateManager extends BukkitRunnable {
 			// Sort the blocks from the bottom up to minimize lower altitude block updates
 			for(int posy=maxy;posy>=miny;posy--) {
 				for(MapUpdateCommand test : mapUpdates) {
-					if(test.getNewBlockLocation().getY()==posy) {
+					if(test.getNewBlockLocation().y ==posy) {
 						tempSet.add(test);
 					}
 				}

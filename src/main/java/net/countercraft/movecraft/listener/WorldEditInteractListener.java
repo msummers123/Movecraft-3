@@ -21,34 +21,27 @@ import net.countercraft.movecraft.Movecraft;
 import net.countercraft.movecraft.config.Settings;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
-import net.countercraft.movecraft.craft.CraftType;
 import net.countercraft.movecraft.localisation.I18nSupport;
 import net.countercraft.movecraft.utils.MapUpdateCommand;
 import net.countercraft.movecraft.utils.MapUpdateManager;
-import net.countercraft.movecraft.utils.MathUtils;
 import net.countercraft.movecraft.utils.MovecraftLocation;
-import net.countercraft.movecraft.utils.Rotation;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.v1_9_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.sk89q.worldedit.CuboidClipboard;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 //import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.blocks.SignBlock;
@@ -127,8 +120,8 @@ public class WorldEditInteractListener implements Listener {
 					final int[] ignoredBlocks = new int[]{ 26,34,64,71,140,144,176,177,193,194,195,196,197 };  // BLOCKS THAT CAN'T BE PARTIALLY RECONSTRUCTED
 
 					for(MovecraftLocation loc : pCraft.getBlockList()) {
-						Vector ccpos = new Vector(loc.getX()-pCraft.getMinX(),loc.getY()-pCraft.getMinY(),loc.getZ()-pCraft.getMinZ());
-						Block b=sign.getWorld().getBlockAt(loc.getX(), loc.getY(), loc.getZ());
+						Vector ccpos = new Vector(loc.x -pCraft.getMinX(), loc.y -pCraft.getMinY(), loc.z -pCraft.getMinZ());
+						Block b=sign.getWorld().getBlockAt(loc.x, loc.y, loc.z);
 						boolean isIgnored=(Arrays.binarySearch(ignoredBlocks,b.getTypeId())>=0);
 						if(!isIgnored) {
 							com.sk89q.worldedit.blocks.BaseBlock bb;
@@ -302,7 +295,7 @@ public class WorldEditInteractListener implements Listener {
 					int remainingQty=numMissingItems.get(typeID);
 					ArrayList<InventoryHolder> chests=new ArrayList<InventoryHolder>();
 					for (MovecraftLocation loc : pCraft.getBlockList()) {
-	                    Block b=pCraft.getW().getBlockAt(loc.getX(), loc.getY(), loc.getZ());
+						Block b=pCraft.getW().getBlockAt(loc.x, loc.y, loc.z);
 	                    if((b.getTypeId()==54)||(b.getTypeId()==146)) {
 	                        InventoryHolder inventoryHolder = ( InventoryHolder ) b.getState();
 	                        if(inventoryHolder.getInventory().contains(typeID) && remainingQty>0) {

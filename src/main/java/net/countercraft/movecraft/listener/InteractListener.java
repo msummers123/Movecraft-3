@@ -23,8 +23,6 @@ import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.CraftType;
 import net.countercraft.movecraft.localisation.I18nSupport;
-import net.countercraft.movecraft.utils.MapUpdateCommand;
-import net.countercraft.movecraft.utils.MapUpdateManager;
 import net.countercraft.movecraft.utils.MathUtils;
 import net.countercraft.movecraft.utils.MovecraftLocation;
 import net.countercraft.movecraft.utils.Rotation;
@@ -32,27 +30,16 @@ import net.countercraft.movecraft.utils.Rotation;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.v1_9_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 public class InteractListener implements Listener {
@@ -97,7 +84,7 @@ public class InteractListener implements Listener {
 					String targetText=org.bukkit.ChatColor.stripColor(sign.getLine(1));
 					MovecraftLocation foundLoc=null;
 					for(MovecraftLocation tloc : foundCraft.getBlockList()) {
-						Block tb=event.getClickedBlock().getWorld().getBlockAt(tloc.getX(), tloc.getY(), tloc.getZ());
+						Block tb=event.getClickedBlock().getWorld().getBlockAt(tloc.x, tloc.y, tloc.z);
 						if(tb.getType().equals(Material.SIGN_POST) || tb.getType().equals(Material.WALL_SIGN)) {
 							Sign ts=( Sign ) tb.getState();
 							if(org.bukkit.ChatColor.stripColor(ts.getLine(0))!=null) 
@@ -126,7 +113,7 @@ public class InteractListener implements Listener {
 						return;						
 					}
 
-					Block newBlock=event.getClickedBlock().getWorld().getBlockAt(foundLoc.getX(), foundLoc.getY(), foundLoc.getZ());
+					Block newBlock=event.getClickedBlock().getWorld().getBlockAt(foundLoc.x, foundLoc.y, foundLoc.z);
 					PlayerInteractEvent newEvent=new PlayerInteractEvent(event.getPlayer(), event.getAction(), event.getItem(), newBlock, event.getBlockFace());
 					onPlayerInteract(newEvent);
 					event.setCancelled( true );

@@ -89,32 +89,45 @@ public class CraftType {
 		return (Double)obj;
 	}
 
+	private int typeIDFromString(String s) {
+		try {
+			return Integer.valueOf(s);
+		} catch(NumberFormatException e) {
+			return Material.getMaterial(s).getId();
+		}
+	}
+
+	private int blockIDFromObject(Object obj) {
+		if(obj instanceof String) {
+			String str = (String) obj;
+
+			if (str.contains(":")) {
+				String[] parts = str.split(":");
+				Integer typeID = typeIDFromString(parts[0]);
+				Integer metaData = Integer.valueOf(parts[1]);
+				// Id greater than 10000 indicates it has a meta data / damage value.
+				return 10000 + (typeID << 4) + metaData;
+			} else {
+				return typeIDFromString(str);
+			}
+		} else {
+			Integer typeID=(Integer)obj;
+			return typeID;
+		}
+	}
+
 	private Integer[] blockIDListFromObject(Object obj) {
 		ArrayList<Integer> returnList=new ArrayList<Integer>();
 		ArrayList objList=(ArrayList) obj;
 		for(Object i : objList) {
-			if(i instanceof String) {
-				String str=(String)i;
-				if(str.contains(":")) {
-					String[] parts=str.split(":");
-					Integer typeID=Integer.valueOf(parts[0]);
-					Integer metaData=Integer.valueOf(parts[1]);
-					returnList.add(10000+(typeID<<4)+metaData);  // id greater than 10000 indicates it has a meta data / damage value
-				} else {
-					Integer typeID=Integer.valueOf(str);
-					returnList.add(typeID);
-				}
-			} else {
-				Integer typeID=(Integer)i;
-				returnList.add(typeID);
-			}
+			returnList.add(blockIDFromObject(i));
 		}
 		return returnList.toArray(new Integer[1]);
 	}
 
 	private HashMap<ArrayList<Integer>, ArrayList<Double>> blockIDMapListFromObject(Object obj) {
 		//flyBlocks = ( HashMap<Integer, ArrayList<Double>> ) data.get( "flyblocks" );
-		
+
 		HashMap<ArrayList<Integer>, ArrayList<Double>> returnMap=new HashMap<ArrayList<Integer>, ArrayList<Double>>();
 		HashMap<Object, Object> objMap=(HashMap<Object, Object>) obj;
 		for(Object i : objMap.keySet()) {
@@ -123,39 +136,10 @@ public class CraftType {
 			// first read in the list of the blocks that type of flyblock. It could be a single string (with or without a ":") or integer, or it could be multiple of them
 			if(i instanceof ArrayList<?>) {
 				for(Object o : (ArrayList<Object>)i) {
-					if(o instanceof String) {
-						String str=(String)o;
-						if(str.contains(":")) {
-							String[] parts=str.split(":");
-							Integer typeID=Integer.valueOf(parts[0]);
-							Integer metaData=Integer.valueOf(parts[1]);
-							rowList.add(10000+(typeID<<4)+metaData);  // id greater than 10000 indicates it has a meta data / damage value
-						} else {
-							Integer typeID=Integer.valueOf(str);
-							rowList.add(typeID);
-						}
-					} else {
-						Integer typeID=(Integer)o;
-						rowList.add(typeID);
-					}
+					rowList.add(blockIDFromObject(o));
 				}
-			} else 
-			if(i instanceof String) {
-				String str=(String)i;
-				if(str.contains(":")) {
-					String[] parts=str.split(":");
-					Integer typeID=Integer.valueOf(parts[0]);
-					Integer metaData=Integer.valueOf(parts[1]);
-					rowList.add(10000+(typeID<<4)+metaData);  // id greater than 10000 indicates it has a meta data / damage value
-				} else {
-					Integer typeID=Integer.valueOf(str);
-					rowList.add(typeID);
-				}
-			} else {
-				Integer typeID=(Integer)i;
-				rowList.add(typeID);
-			}
-			
+			} else rowList.add(blockIDFromObject(i));
+
 			// then read in the limitation values, low and high
 			ArrayList<Object> objList=(ArrayList<Object>)objMap.get(i);
 			ArrayList<Double> limitList=new ArrayList<Double>();

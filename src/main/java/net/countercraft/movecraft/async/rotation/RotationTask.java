@@ -22,7 +22,6 @@ import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownyWorld;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.StateFlag;
 
 import net.countercraft.movecraft.Movecraft;
 import net.countercraft.movecraft.async.AsyncTask;
@@ -38,24 +37,19 @@ import net.countercraft.movecraft.utils.MovecraftLocation;
 import net.countercraft.movecraft.utils.Rotation;
 
 import org.apache.commons.collections.ListUtils;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 
 import net.countercraft.movecraft.utils.TownyUtils;
 import net.countercraft.movecraft.utils.TownyWorldHeightLimits;
@@ -183,7 +177,7 @@ public class RotationTask extends AsyncTask {
             if(getCraft().getBurningFuel()<fuelBurnRate) {
                 Block fuelHolder=null;
                 for (MovecraftLocation bTest : blockList) {
-                        Block b=getCraft().getW().getBlockAt(bTest.getX(), bTest.getY(), bTest.getZ());
+					Block b=getCraft().getW().getBlockAt(bTest.x, bTest.y, bTest.z);
                         if(b.getTypeId()==61) {
                                 InventoryHolder inventoryHolder = ( InventoryHolder ) b.getState();
                                 if(inventoryHolder.getInventory().contains(263) || inventoryHolder.getInventory().contains(173)) {
@@ -259,25 +253,25 @@ public class RotationTask extends AsyncTask {
 		for ( int i = 0; i < blockList.length; i++ ) {
 
 			blockList[i] = MathUtils.rotateVec( rotation, centeredBlockList[i] ).add( originPoint );
-			int typeID = w.getBlockTypeIdAt( blockList[i].getX(), blockList[i].getY(), blockList[i].getZ() );
-            
-            Material testMaterial = w.getBlockAt(originalBlockList[i].getX(), originalBlockList[i].getY(), originalBlockList[i].getZ()).getType();
+			int typeID = w.getBlockTypeIdAt(blockList[i].x, blockList[i].y, blockList[i].z);
+
+			Material testMaterial = w.getBlockAt(originalBlockList[i].x, originalBlockList[i].y, originalBlockList[i].z).getType();
                     
             if (testMaterial.equals(Material.CHEST) || testMaterial.equals(Material.TRAPPED_CHEST)){
                if (!checkChests(testMaterial, blockList[i], existingBlockSet)){
                     //prevent chests collision
                     failed = true;
-					failMessage = String.format( I18nSupport.getInternationalisedString( "Rotation - Craft is obstructed" )+" @ %d,%d,%d", blockList[i].getX(), blockList[i].getY(), blockList[i].getZ() );
+				   failMessage = String.format( I18nSupport.getInternationalisedString( "Rotation - Craft is obstructed" )+" @ %d,%d,%d", blockList[i].x, blockList[i].y, blockList[i].z);
                     break;
                 }
             }
-            Location plugLoc=new Location(w, blockList[i].getX(), blockList[i].getY(), blockList[i].getZ());
+			Location plugLoc=new Location(w, blockList[i].x, blockList[i].y, blockList[i].z);
             if(craftPilot!=null) {
                 // See if they are permitted to build in the area, if WorldGuard integration is turned on
                 if(Movecraft.getInstance().getWorldGuardPlugin()!=null && Settings.WorldGuardBlockMoveOnBuildPerm){
                     if(Movecraft.getInstance().getWorldGuardPlugin().canBuild(craftPilot, plugLoc)==false) {
                             failed = true;
-                            failMessage = String.format( I18nSupport.getInternationalisedString( "Rotation - Player is not permitted to build in this WorldGuard region" )+" @ %d,%d,%d", blockList[i].getX(), blockList[i].getY(), blockList[i].getZ() );
+						failMessage = String.format( I18nSupport.getInternationalisedString( "Rotation - Player is not permitted to build in this WorldGuard region" )+" @ %d,%d,%d", blockList[i].x, blockList[i].y, blockList[i].z);
                             break;
                     }
                 }
@@ -295,7 +289,7 @@ public class RotationTask extends AsyncTask {
                     WGCustomFlagsUtils WGCFU = new WGCustomFlagsUtils();
                     if (!WGCFU.validateFlag(plugLoc,Movecraft.FLAG_ROTATE,lp)){
                         failed = true;
-                        failMessage = String.format( I18nSupport.getInternationalisedString( "WGCustomFlags - Rotation Failed" )+" @ %d,%d,%d", blockList[i].getX(), blockList[i].getY(), blockList[i].getZ() );
+						failMessage = String.format( I18nSupport.getInternationalisedString( "WGCustomFlags - Rotation Failed" )+" @ %d,%d,%d", blockList[i].x, blockList[i].y, blockList[i].z);
                         break;
                     }
                 }
@@ -334,7 +328,7 @@ public class RotationTask extends AsyncTask {
                                         }
                                     }
                                     if (failed){
-                                        failMessage = String.format( I18nSupport.getInternationalisedString( "Towny - Rotation Failed" ) + " %s @ %d,%d,%d", town.getName(), blockList[i].getX(), blockList[i].getY(), blockList[i].getZ() );
+										failMessage = String.format( I18nSupport.getInternationalisedString( "Towny - Rotation Failed" ) + " %s @ %d,%d,%d", town.getName(), blockList[i].x, blockList[i].y, blockList[i].z);
                                         break;
                                     }
                                 }
@@ -347,11 +341,11 @@ public class RotationTask extends AsyncTask {
 			if (!waterCraft) {
 				if ( (typeID != 0 && typeID!=34) && !existingBlockSet.contains( blockList[i] ) ) {
 					failed = true;
-					failMessage = String.format( I18nSupport.getInternationalisedString( "Rotation - Craft is obstructed" )+" @ %d,%d,%d", blockList[i].getX(), blockList[i].getY(), blockList[i].getZ() );
+					failMessage = String.format( I18nSupport.getInternationalisedString( "Rotation - Craft is obstructed" )+" @ %d,%d,%d", blockList[i].x, blockList[i].y, blockList[i].z);
 					break;
 				} else {
-					int id = w.getBlockTypeIdAt( originalBlockList[i].getX(), originalBlockList[i].getY(), originalBlockList[i].getZ() );
-					byte data = w.getBlockAt( originalBlockList[i].getX(), originalBlockList[i].getY(), originalBlockList[i].getZ() ).getData();
+					int id = w.getBlockTypeIdAt(originalBlockList[i].x, originalBlockList[i].y, originalBlockList[i].z);
+					byte data = w.getBlockAt(originalBlockList[i].x, originalBlockList[i].y, originalBlockList[i].z).getData();
 					if ( BlockUtils.blockRequiresRotation( id ) ) {
 						data = BlockUtils.rotate( data, id, rotation );
 					}
@@ -361,11 +355,11 @@ public class RotationTask extends AsyncTask {
 				// allow watercraft to rotate through water
 				if ( (typeID != 0 && typeID != 9 && typeID!=34) && !existingBlockSet.contains( blockList[i] ) ) {
 					failed = true;
-					failMessage = String.format( I18nSupport.getInternationalisedString( "Rotation - Craft is obstructed" )+" @ %d,%d,%d", blockList[i].getX(), blockList[i].getY(), blockList[i].getZ() );
+					failMessage = String.format( I18nSupport.getInternationalisedString( "Rotation - Craft is obstructed" )+" @ %d,%d,%d", blockList[i].x, blockList[i].y, blockList[i].z);
 					break;
 				} else {
-					int id = w.getBlockTypeIdAt( originalBlockList[i].getX(), originalBlockList[i].getY(), originalBlockList[i].getZ() );
-					byte data = w.getBlockAt( originalBlockList[i].getX(), originalBlockList[i].getY(), originalBlockList[i].getZ() ).getData();
+					int id = w.getBlockTypeIdAt(originalBlockList[i].x, originalBlockList[i].y, originalBlockList[i].z);
+					byte data = w.getBlockAt(originalBlockList[i].x, originalBlockList[i].y, originalBlockList[i].z).getData();
 					if ( BlockUtils.blockRequiresRotation( id ) ) {
 						data = BlockUtils.rotate( data, id, rotation );
 					}
@@ -377,7 +371,7 @@ public class RotationTask extends AsyncTask {
 
 		if ( !failed ) {
 			//rotate entities in the craft
-			Location tOP = new Location( getCraft().getW(), originPoint.getX(), originPoint.getY(), originPoint.getZ() );
+			Location tOP = new Location( getCraft().getW(), originPoint.x, originPoint.y, originPoint.z);
 			
 			List<Entity> eList=null;
 			int numTries=0;
@@ -468,7 +462,7 @@ public class RotationTask extends AsyncTask {
 			for ( MovecraftLocation l1 : airLocation ) {
 				if(waterCraft) {
 						// if its below the waterline, fill in with water. Otherwise fill in with air.
-					if(l1.getY()<=waterLine) {
+					if(l1.y <=waterLine) {
 						mapUpdates.add( new MapUpdateCommand( l1, 9,(byte)0, null ) );
 					} else {
 						mapUpdates.add( new MapUpdateCommand( l1, 0,(byte)0, null ) );
@@ -489,17 +483,17 @@ public class RotationTask extends AsyncTask {
 
 
 			for ( MovecraftLocation l : blockList ) {
-				if ( maxX == null || l.getX() > maxX ) {
-					maxX = l.getX();
+				if ( maxX == null || l.x > maxX ) {
+					maxX = l.x;
 				}
-				if ( maxZ == null || l.getZ() > maxZ ) {
-					maxZ = l.getZ();
+				if ( maxZ == null || l.z > maxZ ) {
+					maxZ = l.z;
 				}
-				if ( minX == null || l.getX() < minX ) {
-					minX = l.getX();
+				if ( minX == null || l.x < minX ) {
+					minX = l.x;
 				}
-				if ( minZ == null || l.getZ() < minZ ) {
-					minZ = l.getZ();
+				if ( minZ == null || l.z < minZ ) {
+					minZ = l.z;
 				}
 			}
 
@@ -513,26 +507,26 @@ public class RotationTask extends AsyncTask {
 
 
 			for ( MovecraftLocation l : blockList ) {
-				if ( polygonalBox[l.getX() - minX] == null ) {
-					polygonalBox[l.getX() - minX] = new int[sizeZ][];
+				if ( polygonalBox[l.x - minX] == null ) {
+					polygonalBox[l.x - minX] = new int[sizeZ][];
 				}
 
 
-				if ( polygonalBox[l.getX() - minX][l.getZ() - minZ] == null ) {
+				if ( polygonalBox[l.x - minX][l.z - minZ] == null ) {
 
-					polygonalBox[l.getX() - minX][l.getZ() - minZ] = new int[2];
-					polygonalBox[l.getX() - minX][l.getZ() - minZ][0] = l.getY();
-					polygonalBox[l.getX() - minX][l.getZ() - minZ][1] = l.getY();
+					polygonalBox[l.x - minX][l.z - minZ] = new int[2];
+					polygonalBox[l.x - minX][l.z - minZ][0] = l.y;
+					polygonalBox[l.x - minX][l.z - minZ][1] = l.y;
 
 				} else {
-					minY = polygonalBox[l.getX() - minX][l.getZ() - minZ][0];
-					maxY = polygonalBox[l.getX() - minX][l.getZ() - minZ][1];
+					minY = polygonalBox[l.x - minX][l.z - minZ][0];
+					maxY = polygonalBox[l.x - minX][l.z - minZ][1];
 
-					if ( l.getY() < minY ) {
-						polygonalBox[l.getX() - minX][l.getZ() - minZ][0] = l.getY();
+					if ( l.y < minY ) {
+						polygonalBox[l.x - minX][l.z - minZ][0] = l.y;
 					}
-					if ( l.getY() > maxY ) {
-						polygonalBox[l.getX() - minX][l.getZ() - minZ][1] = l.getY();
+					if ( l.y > maxY ) {
+						polygonalBox[l.x - minX][l.z - minZ][1] = l.y;
 					}
 
 				}
@@ -548,10 +542,10 @@ public class RotationTask extends AsyncTask {
 				int farthestX=0;
 				int farthestZ=0;
 				for(MovecraftLocation loc : blockList) {
-					if(Math.abs(loc.getX()-originPoint.getX()) > Math.abs(farthestX))
-						farthestX=loc.getX()-originPoint.getX();
-					if(Math.abs(loc.getZ()-originPoint.getZ()) > Math.abs(farthestZ))
-						farthestZ=loc.getZ()-originPoint.getZ();
+					if(Math.abs(loc.x - originPoint.x) > Math.abs(farthestX))
+						farthestX= loc.x - originPoint.x;
+					if(Math.abs(loc.z - originPoint.z) > Math.abs(farthestZ))
+						farthestZ= loc.z - originPoint.z;
 				}
 				if(Math.abs(farthestX)>Math.abs(farthestZ)) {
 					if(farthestX>0) {
@@ -591,17 +585,17 @@ public class RotationTask extends AsyncTask {
 						Integer parentMinX = null;
 						Integer parentMinZ = null;
 						for ( MovecraftLocation l : parentBlockList ) {
-							if ( parentMaxX == null || l.getX() > parentMaxX ) {
-								parentMaxX = l.getX();
+							if ( parentMaxX == null || l.x > parentMaxX ) {
+								parentMaxX = l.x;
 							}
-							if ( parentMaxZ == null || l.getZ() > parentMaxZ ) {
-								parentMaxZ = l.getZ();
+							if ( parentMaxZ == null || l.z > parentMaxZ ) {
+								parentMaxZ = l.z;
 							}
-							if ( parentMinX == null || l.getX() < parentMinX ) {
-								parentMinX = l.getX();
+							if ( parentMinX == null || l.x < parentMinX ) {
+								parentMinX = l.x;
 							}
-							if ( parentMinZ == null || l.getZ() < parentMinZ ) {
-								parentMinZ = l.getZ();
+							if ( parentMinZ == null || l.z < parentMinZ ) {
+								parentMinZ = l.z;
 							}
 						}
 						int parentSizeX, parentSizeZ;
@@ -609,22 +603,22 @@ public class RotationTask extends AsyncTask {
 						parentSizeZ = ( parentMaxZ - parentMinZ ) + 1;
 						int[][][] parentPolygonalBox = new int[parentSizeX][][];
 						for ( MovecraftLocation l : parentBlockList ) {
-							if ( parentPolygonalBox[l.getX() - parentMinX] == null ) {
-								parentPolygonalBox[l.getX() - parentMinX] = new int[parentSizeZ][];
+							if ( parentPolygonalBox[l.x - parentMinX] == null ) {
+								parentPolygonalBox[l.x - parentMinX] = new int[parentSizeZ][];
 							}
-							if ( parentPolygonalBox[l.getX() - parentMinX][l.getZ() - parentMinZ] == null ) {
-								parentPolygonalBox[l.getX() - parentMinX][l.getZ() - parentMinZ] = new int[2];
-								parentPolygonalBox[l.getX() - parentMinX][l.getZ() - parentMinZ][0] = l.getY();
-								parentPolygonalBox[l.getX() - parentMinX][l.getZ() - parentMinZ][1] = l.getY();
+							if ( parentPolygonalBox[l.x - parentMinX][l.z - parentMinZ] == null ) {
+								parentPolygonalBox[l.x - parentMinX][l.z - parentMinZ] = new int[2];
+								parentPolygonalBox[l.x - parentMinX][l.z - parentMinZ][0] = l.y;
+								parentPolygonalBox[l.x - parentMinX][l.z - parentMinZ][1] = l.y;
 							} else {
-								int parentMinY = parentPolygonalBox[l.getX() - parentMinX][l.getZ() - parentMinZ][0];
-								int parentMaxY = parentPolygonalBox[l.getX() - parentMinX][l.getZ() - parentMinZ][1];
+								int parentMinY = parentPolygonalBox[l.x - parentMinX][l.z - parentMinZ][0];
+								int parentMaxY = parentPolygonalBox[l.x - parentMinX][l.z - parentMinZ][1];
 
-								if ( l.getY() < parentMinY ) {
-									parentPolygonalBox[l.getX() - parentMinX][l.getZ() - parentMinZ][0] = l.getY();
+								if ( l.y < parentMinY ) {
+									parentPolygonalBox[l.x - parentMinX][l.z - parentMinZ][0] = l.y;
 								}
-								if ( l.getY() > parentMaxY ) {
-									parentPolygonalBox[l.getX() - parentMinX][l.getZ() - parentMinZ][1] = l.getY();
+								if ( l.y > parentMaxY ) {
+									parentPolygonalBox[l.x - parentMinX][l.z - parentMinZ][1] = l.y;
 								}
 							}
 						}
@@ -687,7 +681,7 @@ public class RotationTask extends AsyncTask {
         MovecraftLocation aroundNewLoc;
         
         aroundNewLoc = newLoc.translate( 1, 0, 0);
-        testMaterial = getCraft().getW().getBlockAt( aroundNewLoc.getX(), aroundNewLoc.getY(), aroundNewLoc.getZ()).getType();
+		testMaterial = getCraft().getW().getBlockAt(aroundNewLoc.x, aroundNewLoc.y, aroundNewLoc.z).getType();
         if (testMaterial.equals(mBlock)){
             if (!existingBlockSet.contains(aroundNewLoc)){
                 return false;
@@ -695,7 +689,7 @@ public class RotationTask extends AsyncTask {
         }
         
         aroundNewLoc = newLoc.translate( -1, 0, 0);
-        testMaterial = getCraft().getW().getBlockAt( aroundNewLoc.getX(), aroundNewLoc.getY(), aroundNewLoc.getZ()).getType();
+		testMaterial = getCraft().getW().getBlockAt(aroundNewLoc.x, aroundNewLoc.y, aroundNewLoc.z).getType();
         if (testMaterial.equals(mBlock)){
             if (!existingBlockSet.contains(aroundNewLoc)){
                 return false;
@@ -703,7 +697,7 @@ public class RotationTask extends AsyncTask {
         }
         
         aroundNewLoc = newLoc.translate( 0, 0, 1);
-        testMaterial = getCraft().getW().getBlockAt( aroundNewLoc.getX(), aroundNewLoc.getY(), aroundNewLoc.getZ()).getType();
+		testMaterial = getCraft().getW().getBlockAt(aroundNewLoc.x, aroundNewLoc.y, aroundNewLoc.z).getType();
         if (testMaterial.equals(mBlock)){
             if (!existingBlockSet.contains(aroundNewLoc)){
                 return false;
@@ -711,7 +705,7 @@ public class RotationTask extends AsyncTask {
         }
         
         aroundNewLoc = newLoc.translate( 0, 0, -1);
-        testMaterial = getCraft().getW().getBlockAt( aroundNewLoc.getX(), aroundNewLoc.getY(), aroundNewLoc.getZ()).getType();
+		testMaterial = getCraft().getW().getBlockAt(aroundNewLoc.x, aroundNewLoc.y, aroundNewLoc.z).getType();
         if (testMaterial.equals(mBlock)){
             if (!existingBlockSet.contains(aroundNewLoc)){
                 return false;
