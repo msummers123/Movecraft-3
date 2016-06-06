@@ -72,13 +72,17 @@ public class CraftManager {
 
 		boolean foundCraft=false;
 		for ( File file : craftsFile.listFiles() ) {
-			if ( file.isFile() ) {
-
-				if ( file.getName().contains( ".craft" ) ) {
-					CraftType type = new CraftType( file );
-					craftTypesSet.add( type );
-					foundCraft=true;
+			if ( file.isFile() && (file.getName().endsWith(".craft") || file.getName().endsWith(".yaml"))) {
+				if (file.getName().endsWith(".craft")) {
+					String name = file.getName();
+					String newName = name.substring(0, name.length() - ".craft".length()) + ".yaml";
+					Movecraft.getInstance().getLogger().warning(
+							"\"craft\" extension is deprecated, please rename " + name + " to " + newName);
 				}
+
+				CraftType type = new CraftType( file );
+				craftTypesSet.add( type );
+				foundCraft=true;
 			}
 		}
 		if(!foundCraft) {
