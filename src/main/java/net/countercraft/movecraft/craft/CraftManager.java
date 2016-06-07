@@ -70,22 +70,23 @@ public class CraftManager {
 
 		HashSet<CraftType> craftTypesSet = new HashSet<CraftType>();
 
-		boolean foundCraft=false;
+		boolean foundAtLeastOneCraft = false;
+		boolean foundDotCraftFiles = false;
 		for ( File file : craftsFile.listFiles() ) {
 			if ( file.isFile() && (file.getName().endsWith(".craft") || file.getName().endsWith(".yaml"))) {
 				if (file.getName().endsWith(".craft")) {
-					String name = file.getName();
-					String newName = name.substring(0, name.length() - ".craft".length()) + ".yaml";
-					Movecraft.getInstance().getLogger().warning(
-							"\"craft\" extension is deprecated, please rename " + name + " to " + newName);
+					foundDotCraftFiles = true;
 				}
 
 				CraftType type = new CraftType( file );
 				craftTypesSet.add( type );
-				foundCraft=true;
+				foundAtLeastOneCraft=true;
 			}
 		}
-		if(!foundCraft) {
+		if (foundDotCraftFiles) {
+			Movecraft.getInstance().getLogger().warning("\".craft\" extension is deprecated, please use \".yaml\"");
+		}
+		if(!foundAtLeastOneCraft) {
 			Movecraft.getInstance().getLogger().log(Level.SEVERE, "ERROR: NO CRAFTS FOUND!!!");
 		}
 		craftTypes = craftTypesSet.toArray( new CraftType[1] );
@@ -117,7 +118,7 @@ public class CraftManager {
 		}
 		craftList.get( c.getW() ).remove( c );
 		if ( getPlayerFromCraft( c ) != null ) {
-			getPlayerFromCraft( c ).sendMessage( String.format( I18nSupport.getInternationalisedString( "Release - Craft has been released message" ) ) );
+			getPlayerFromCraft( c ).sendMessage( String.format(I18nSupport.getInternationalisedString("Release - Craft has been released message" ) ) );
 			Movecraft.getInstance().getLogger().log( Level.INFO, String.format( I18nSupport.getInternationalisedString( "Release - Player has released a craft console" ), c.getNotificationPlayer().getName(), c.getType().getCraftName(), c.getBlockList().length, c.getMinX(), c.getMinZ() ) );
 		} else {
 			Movecraft.getInstance().getLogger().log( Level.INFO, String.format( I18nSupport.getInternationalisedString( "NULL Player has released a craft of type %s with size %d at coordinates : %d x , %d z" ),  c.getType().getCraftName(), c.getBlockList().length, c.getMinX(), c.getMinZ() ) );
@@ -166,7 +167,7 @@ public class CraftManager {
 	public void removePlayerFromCraft( Craft c ) {
 		if ( getPlayerFromCraft( c ) != null ) {
 			removeReleaseTask(c);
-			getPlayerFromCraft( c ).sendMessage( String.format( I18nSupport.getInternationalisedString( "Release - Craft has been released message" ) ) );
+			getPlayerFromCraft( c ).sendMessage( String.format(I18nSupport.getInternationalisedString("Release - Craft has been released message" ) ) );
 			Movecraft.getInstance().getLogger().log( Level.INFO, String.format( I18nSupport.getInternationalisedString( "Release - Player has released a craft console" ), c.getNotificationPlayer().getName(), c.getType().getCraftName(), c.getBlockList().length, c.getMinX(), c.getMinZ() ) );
 			Player p=getPlayerFromCraft( c );
 			craftPlayerIndex.put(null, c);
@@ -182,7 +183,7 @@ public class CraftManager {
 	public final void addReleaseTask(final Craft c){
 		Player p = getPlayerFromCraft( c );
 		if ( !getReleaseEvents().containsKey( p ) ) {
-			p.sendMessage( String.format( I18nSupport.getInternationalisedString( "Release - Player has left craft" ) ) );
+			p.sendMessage( String.format(I18nSupport.getInternationalisedString("Release - Player has left craft" ) ) );
 			BukkitTask releaseTask = new BukkitRunnable() {
 				@Override
 				public void run() {
