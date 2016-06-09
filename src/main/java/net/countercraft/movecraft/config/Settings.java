@@ -70,4 +70,5 @@ public class Settings {
     public static Map<String, String> SiegeControlRegion;
 	public static Map<String, Integer> SiegeDelay;
 	public static Map<String, Integer> SiegeDuration;
+	public static Map<String, Integer> SiegeDayOfTheWeek;
 }
