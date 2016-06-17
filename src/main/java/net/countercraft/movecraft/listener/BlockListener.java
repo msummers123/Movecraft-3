@@ -248,8 +248,8 @@ public class BlockListener implements Listener {
         }
         
         if(signText.equalsIgnoreCase( "Pilot:")) {
-            String crewName=org.bukkit.ChatColor.stripColor(event.getLine(1));
-        	if(p.getName().isEmpty()) {
+            String pilotName=org.bukkit.ChatColor.stripColor(event.getLine(1));
+        	if(pilotName.isEmpty()) {
 				event.setLine(1, p.getName());
 		}
         }
