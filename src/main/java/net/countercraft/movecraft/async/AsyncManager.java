@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
  * This file is part of Movecraft.
  *
