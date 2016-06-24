@@ -63,6 +63,7 @@ public class CraftType {
 	private float collisionExplosion;
 	private int tickCooldown;
 	private HashMap<ArrayList<Integer>, ArrayList<Double>> flyBlocks = new HashMap<ArrayList<Integer>, ArrayList<Double>>();
+	private HashMap<ArrayList<Integer>, Integer> weightBlocks = new HashMap<ArrayList<Integer>, Integer>();
 	private int hoverLimit;
 	private List<Material> harvestBlocks;
         private List<Material> harvesterBladeBlocks;
@@ -611,6 +612,9 @@ public class CraftType {
 
 	public HashMap<ArrayList<Integer>, ArrayList<Double>> getFlyBlocks() {
 		return flyBlocks;
+	}
+	public HashMap<ArrayList<Integer>, Integer> getWeightBlocks() {
+		return weightBlocks;
 	}
 	
         public int getMaxHeightLimit(){

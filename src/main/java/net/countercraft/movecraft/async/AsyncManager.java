@@ -1,3 +1,4 @@
+
 /*
  * This file is part of Movecraft.
  *
@@ -44,6 +45,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -629,6 +631,7 @@ public class AsyncManager extends BukkitRunnable {
 								int totalNonAirBlocks = 0;
 								int totalNonAirWaterBlocks = 0;
 								HashMap<ArrayList<Integer>, Integer> foundFlyBlocks = new HashMap<ArrayList<Integer>, Integer>();
+								HashMap<ArrayList<Integer>, Integer> foundWeightBlocks = new HashMap<ArrayList<Integer>, Integer>();
 								boolean regionPVPBlocked = false;
 								boolean sinkingForbiddenByFlag = false;
 								boolean sinkingForbiddenByTowny = false;
@@ -667,6 +670,21 @@ public class AsyncManager extends BukkitRunnable {
 									if (blockID != 0 && blockID != 8 && blockID != 9) {
 										totalNonAirWaterBlocks++;
 									}
+									if (blockID == 54 || blockID == 23 || blockID == 146) {
+										InventoryHolder inventory = (InventoryHolder) w.getBlockAt(l.getX(), l.getY(), l.getZ()).getState();
+										for (ArrayList<Integer> weightBlockDef : pcraft.getType().getWeightBlocks().keySet()) {
+											for (Integer item : weightBlockDef) {
+												if (inventory.getInventory().contains(item)) {
+													Integer count = foundWeightBlocks.get(weightBlockDef);
+													if (count == null) {
+														foundWeightBlocks.put(weightBlockDef, 1);
+													} else {
+														foundWeightBlocks.put(weightBlockDef, count + 1);
+													}
+												}
+											}
+										}
+									}
 								}
 
 								// now see if any of the resulting percentages
@@ -685,6 +703,22 @@ public class AsyncManager extends BukkitRunnable {
 										isSinking = true;
 									}
 
+								}
+								//As well as weight
+								for (ArrayList<Integer> i : pcraft.getType().getWeightBlocks().keySet()) {
+									int numfound = 0;
+									if(foundWeightBlocks.get(i) != null) {
+										numfound = foundWeightBlocks.get(i);
+									}
+									double percent = ((double) numfound / (double) totalNonAirBlocks) * 100;
+									double weightPercent = pcraft.getType().getWeightBlocks().get(i);
+									if (percent > weightPercent) {
+										pcraft.getNotificationPlayer().sendMessage("Your craft has been released because it has become too heavy.");
+										Player p = CraftManager.getInstance().getPlayerFromCraft(pcraft);
+										pcraft.setCruising(false);
+										pcraft.setKeepMoving(false);
+										CraftManager.getInstance().removeCraft(pcraft);
+									}
 								}
 
 								// And check the overallsinkpercent
