@@ -78,14 +78,14 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.5.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.0</version>
+                <version>2.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -112,6 +112,9 @@
                                     <exclude>com.google.guava</exclude>
                                     <exclude>com.google.code.findbugs:jsr305</exclude>
                                     <exclude>net.ess3:Essentials</exclude>
+                                    <exclude>com.palmergames:Towny</exclude>
+                                    <exclude>net.milkbowl.vault:VaultAPI</exclude>
+                                    <exclude>com.mewin:WGCustomFlags</exclude>
                                 </excludes>
                             </artifactSet>
                             <minimizeJar>true</minimizeJar>
@@ -148,7 +151,7 @@
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>3.2.1</version>
+            <version>3.2.2</version>
         </dependency>
         
         <dependency>
@@ -174,7 +177,17 @@
 	        <groupId>at.pavlov</groupId>
     	    <artifactId>Cannons</artifactId>
         	<version>LATEST</version>
-    	</dependency>
+        	<exclusions>
+        		<exclusion>
+        			<artifactId>dummypermscompat</artifactId>
+        			<groupId>com.sk89q</groupId>
+        		</exclusion>
+        		<exclusion>
+        			<artifactId>worldedit-bukkit</artifactId>
+        			<groupId>com.sk89q.worldedit</groupId>
+        		</exclusion>
+        	</exclusions>
+        </dependency>
     	
   <!--   	<dependency>
             <groupId>org.spigotmc</groupId>
@@ -185,7 +198,7 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.8.7-R0.1-SNAPSHOT</version>
+            <version>1.9.2-R0.1-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
@@ -193,7 +206,7 @@
 		<dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
-            <version>1.8.7-R0.1-SNAPSHOT</version>
+            <version>1.9.2-R0.1-SNAPSHOT</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/libs/craftbukkit.jar</systemPath>
         </dependency>

@@ -113,6 +113,23 @@ public class BlockListener implements Listener {
 		if ( e.isCancelled() ) {
 			return;
 		}
+		if(Settings.ProtectPilotedCrafts) {
+			MovecraftLocation mloc=MathUtils.bukkit2MovecraftLoc(e.getBlock().getLocation());
+			boolean blockInCraft=false;
+			if(CraftManager.getInstance().getCraftsInWorld(e.getBlock().getWorld())!=null)
+				for(Craft craft : CraftManager.getInstance().getCraftsInWorld(e.getBlock().getWorld())) {
+					if(craft!=null) {
+						for(MovecraftLocation tloc : craft.getBlockList()) {
+							if(tloc.getX()==mloc.getX() && tloc.getY()==mloc.getY() && tloc.getZ()==mloc.getZ())
+								blockInCraft=true;
+						}
+					}				
+				}
+			if(blockInCraft) {
+				e.getPlayer().sendMessage( String.format( I18nSupport.getInternationalisedString( "BLOCK IS PART OF A PILOTED CRAFT" ) ) );
+				e.setCancelled(true);
+			}
+		}
 		if ( e.getBlock().getTypeId() == 33 && e.getBlock().getData() == ( ( byte ) 6 ) ) {
 			if(Settings.DisableCrates==true)
 				return;
@@ -229,6 +246,13 @@ public class BlockListener implements Listener {
 //				event.setCancelled(true);
 			}
         }
+        if(signText.equalsIgnoreCase( "Pilot:")) {
+            String pilotName=org.bukkit.ChatColor.stripColor(event.getLine(1));
+        	if(pilotName.isEmpty()) {
+				event.setLine(1, p.getName());
+//				event.setCancelled(true);
+			}
+        }
     }
 	
 	@EventHandler(priority = EventPriority.LOW)
@@ -279,8 +303,8 @@ public class BlockListener implements Listener {
 	@EventHandler(priority=EventPriority.NORMAL)
     public void explodeEvent(EntityExplodeEvent e) {
 		// Remove any blocks from the list that were adjacent to water, to prevent spillage
-		Iterator<Block> i=e.blockList().iterator();
-		if(Settings.DisableSpillProtection==false)
+		if(Settings.DisableSpillProtection==false) {
+			Iterator<Block> i=e.blockList().iterator();
 			while(i.hasNext()) {
 				Block b=i.next();
 				boolean isNearWater=false;
@@ -295,6 +319,22 @@ public class BlockListener implements Listener {
 					i.remove();
 				}
 			}
+		}
+		
+		if(Settings.DurabilityOverride!=null) {
+			Iterator<Block> bi=e.blockList().iterator();
+			while(bi.hasNext()) {
+				Block b=bi.next();
+				if(Settings.DurabilityOverride.containsKey(b.getTypeId())) {
+					long seed=b.getX()+b.getY()+b.getZ()+(System.currentTimeMillis()/50);
+					Random ran=new Random(seed);
+					float chance=ran.nextInt(100);
+					if(chance<Settings.DurabilityOverride.get(b.getTypeId())) {
+						bi.remove();
+					}
+				}
+			}
+		}
 			
 		if(e.getEntity()==null)
 			return;

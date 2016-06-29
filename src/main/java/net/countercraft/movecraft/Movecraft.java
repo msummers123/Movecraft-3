@@ -49,7 +49,9 @@ import com.mewin.WGCustomFlags.WGCustomFlagsPlugin;
 import com.palmergames.bukkit.towny.Towny;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_9_R1.util.CraftMagicNumbers;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -120,7 +122,7 @@ public class Movecraft extends JavaPlugin {
 		Settings.CompatibilityMode = getConfig().getBoolean("CompatibilityMode", false);
 		if(Settings.CompatibilityMode==false) {
 			try {
-				 	Class.forName( "net.minecraft.server.v1_8_R3.Chunk" );
+				 	Class.forName( "net.minecraft.server.v1_9_R1.Chunk" );
 				} catch( ClassNotFoundException e ) {
 					Settings.CompatibilityMode=true;
 					logger.log(Level.INFO, "WARNING: CompatibilityMode was set to false, but required build-specific classes were not found. FORCING COMPATIBILITY MODE");
@@ -134,11 +136,20 @@ public class Movecraft extends JavaPlugin {
 		Settings.FireballLifespan = getConfig().getInt("FireballLifespan", 6);
 		Settings.FireballPenetration = getConfig().getBoolean("FireballPenetration", true);
 		Settings.BlockQueueChunkSize = getConfig().getInt("BlockQueueChunkSize", 1000);
+		Settings.ProtectPilotedCrafts = getConfig().getBoolean("ProtectPilotedCrafts", false);
 		Settings.AllowCrewSigns = getConfig().getBoolean("AllowCrewSigns", true);
 		Settings.SetHomeToCrewSign = getConfig().getBoolean("SetHomeToCrewSign", true);
 		Settings.RequireCreatePerm = getConfig().getBoolean("RequireCreatePerm", false);
 		Settings.TNTContactExplosives = getConfig().getBoolean("TNTContactExplosives", true);
 		Settings.FadeWrecksAfter = getConfig().getInt("FadeWrecksAfter", 0);
+		if(getConfig().contains("DurabilityOverride")) {
+			Map<String, Object> temp=(Map<String, Object>)getConfig().getConfigurationSection("DurabilityOverride").getValues(false);
+			Settings.DurabilityOverride=new HashMap<Integer, Integer>();
+			for(String str : temp.keySet()) {
+				Settings.DurabilityOverride.put(Integer.parseInt(str), (Integer)temp.get(str));
+			}
+			
+		}
 		
 		//load the sieges.yml file
 		File siegesFile = new File( Movecraft.getInstance().getDataFolder().getAbsolutePath() + "/sieges.yml" );
@@ -165,6 +176,10 @@ public class Movecraft extends JavaPlugin {
 			Settings.SiegeControlRegion=new HashMap<String, String>();
 			Settings.SiegeDelay=new HashMap<String, Integer>();
 			Settings.SiegeDuration=new HashMap<String, Integer>();
+			Settings.SiegeDayOfTheWeek=new HashMap<String, Integer>();
+			Settings.SiegeCommandsOnStart=new HashMap<String, ArrayList<String>>();
+			Settings.SiegeCommandsOnWin=new HashMap<String, ArrayList<String>>();
+			Settings.SiegeCommandsOnLose=new HashMap<String, ArrayList<String>>();
 			for(String siegeName : siegesMap.keySet()) {
 				Settings.SiegeRegion.put(siegeName, (String)siegesMap.get(siegeName).get("SiegeRegion"));
 				Settings.SiegeCraftsToWin.put(siegeName, (ArrayList<String>)siegesMap.get(siegeName).get("CraftsToWin"));
@@ -176,8 +191,12 @@ public class Movecraft extends JavaPlugin {
 				Settings.SiegeControlRegion.put(siegeName, (String)siegesMap.get(siegeName).get("RegionToControl"));
 				Settings.SiegeDelay.put(siegeName, (Integer)siegesMap.get(siegeName).get("DelayBeforeStart"));
 				Settings.SiegeDuration.put(siegeName, (Integer)siegesMap.get(siegeName).get("SiegeDuration"));
+				Settings.SiegeDayOfTheWeek.put(siegeName, (Integer)siegesMap.get(siegeName).get("DayOfTheWeek"));
+				Settings.SiegeCommandsOnStart.put(siegeName, (ArrayList<String>)siegesMap.get(siegeName).get("SiegeCommandsOnStart"));
+				Settings.SiegeCommandsOnWin.put(siegeName, (ArrayList<String>)siegesMap.get(siegeName).get("SiegeCommandsOnWin"));
+				Settings.SiegeCommandsOnLose.put(siegeName, (ArrayList<String>)siegesMap.get(siegeName).get("SiegeCommandsOnLose"));
 			}
-			logger.log(Level.INFO, "Siege configuration loaded");
+			logger.log(Level.INFO, "Siege configuration loaded.");
 		}
 		//load up WorldGuard if it's present
 		Plugin wGPlugin=getServer().getPluginManager().getPlugin("WorldGuard");

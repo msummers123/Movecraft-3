@@ -41,8 +41,9 @@ public class CraftType {
 	private String craftName;
 	private int maxSize, minSize, minHeightLimit, maxHeightLimit, maxHeightAboveGround;
 	private Integer[] allowedBlocks, forbiddenBlocks;
+	private String[] forbiddenSignStrings;
 	private boolean blockedByWater, requireWaterContact, tryNudge, canCruise, canTeleport, canStaticMove, canHover, canDirectControl, useGravity, canHoverOverWater, moveEntities;
-	private boolean allowHorizontalMovement, allowVerticalMovement, allowRemoteSign, cruiseOnPilot, allowVerticalTakeoffAndLanding, rotateAtMidpoint;
+	private boolean allowHorizontalMovement, allowVerticalMovement, allowRemoteSign, allowCannonDirectorSign, allowAADirectorSign, cruiseOnPilot, allowVerticalTakeoffAndLanding, rotateAtMidpoint;
 	private int cruiseOnPilotVertMove;
 	private int maxStaticMove;
 	private int cruiseSkipBlocks;
@@ -110,6 +111,21 @@ public class CraftType {
 			}
 		}
 		return returnList.toArray(new Integer[1]);
+	}
+	
+	private String[] stringListFromObject(Object obj) {
+		ArrayList<String> returnList=new ArrayList<String>();
+		if(obj==null) {
+			return returnList.toArray(new String[1]);
+		}
+		ArrayList objList=(ArrayList) obj;
+		for(Object i : objList) {
+			if(i instanceof String) {
+				String str=(String)i;
+				returnList.add(str);
+			}
+		}
+		return returnList.toArray(new String[1]);
 	}
 
 	private HashMap<ArrayList<Integer>, ArrayList<Double>> blockIDMapListFromObject(Object obj) {
@@ -194,6 +210,7 @@ public class CraftType {
 		Arrays.sort(allowedBlocks);
 		
 		forbiddenBlocks = blockIDListFromObject(data.get( "forbiddenBlocks" ));
+		forbiddenSignStrings = stringListFromObject(data.get( "forbiddenSignStrings" ));
 		if(data.containsKey("canFly")) {
 			blockedByWater = ( Boolean ) data.get( "canFly" );
 		} else if (data.containsKey("blockedByWater")) {
@@ -258,6 +275,16 @@ public class CraftType {
 			allowRemoteSign=(Boolean) data.get("allowRemoteSign");
 		} else {
 			allowRemoteSign=true;
+		}
+		if(data.containsKey("allowCannonDirectorSign")) {
+			allowCannonDirectorSign=(Boolean) data.get("allowCannonDirectorSign");
+		} else {
+			allowCannonDirectorSign=true;
+		}
+		if(data.containsKey("allowAADirectorSign")) {
+			allowAADirectorSign=(Boolean) data.get("allowAADirectorSign");
+		} else {
+			allowAADirectorSign=true;
 		}
 		if(data.containsKey("canStaticMove")) {
 			canStaticMove=(Boolean) data.get("canStaticMove");
@@ -454,6 +481,10 @@ public class CraftType {
 		return forbiddenBlocks;
 	}
 
+	public String[] getForbiddenSignStrings() {
+		return forbiddenSignStrings;
+	}
+
 	public boolean blockedByWater() {
 		return blockedByWater;
 	}
@@ -512,6 +543,14 @@ public class CraftType {
 	
 	public boolean allowRemoteSign() {
 		return allowRemoteSign;
+	}
+	
+	public boolean allowCannonDirectorSign() {
+		return allowCannonDirectorSign;
+	}
+	
+	public boolean allowAADirectorSign() {
+		return allowAADirectorSign;
 	}
 	
 	public double getFuelBurnRate() {

@@ -120,6 +120,12 @@ public class CraftManager {
 		}
 		craftPlayerIndex.remove( getPlayerFromCraft( c ) );
 	}
+	
+	public void forceRemoveCraft( Craft c ) {
+		craftList.get( c.getW() ).remove( c );
+		if(getPlayerFromCraft( c )!=null)
+			craftPlayerIndex.remove( getPlayerFromCraft( c ) );					
+	}
 
 	public Craft[] getCraftsInWorld( World w ) {
 		Set<Craft> crafts = craftList.get( w );
@@ -193,7 +199,8 @@ public class CraftManager {
 		Player p = getPlayerFromCraft( c );
 		if (p!= null){
 			if ( releaseEvents.containsKey(p) ) {
-				releaseEvents.get(p).cancel();
+				if(releaseEvents.get(p)!=null)
+					releaseEvents.get(p).cancel();
 				releaseEvents.remove(p);
 			}
 		}

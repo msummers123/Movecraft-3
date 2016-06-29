@@ -34,6 +34,7 @@ import net.countercraft.movecraft.utils.MovecraftLocation;
 
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -66,6 +67,7 @@ import net.countercraft.movecraft.utils.TownyWorldHeightLimits;
 import net.countercraft.movecraft.utils.WGCustomFlagsUtils;
 
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.inventory.Inventory;
 
 public class TranslationTask extends AsyncTask {
@@ -761,11 +763,16 @@ public class TranslationTask extends AsyncTask {
             data.setUpdates(explosionSet.toArray( new MapUpdateCommand[1] ) );
 
             fail( String.format( I18nSupport.getInternationalisedString( "Translation - Failed Craft is obstructed" ) ) );
-            if(getCraft().getSinking()==true) {
-                if(getCraft().getType().getSinkPercent()!=0.0) {
-                    getCraft().setLastBlockCheck(0);
-                }				
-                getCraft().setLastCruisUpdate(-1);
+            if(craftPilot!=null) {
+	            Location location = craftPilot.getLocation();
+	            String name = craftPilot.getName();
+	            Bukkit.getPlayerExact(name).getWorld().playSound(location,Sound.BLOCK_ANVIL_LAND,1, 0);
+	            if(getCraft().getSinking()==true) {
+	                if(getCraft().getType().getSinkPercent()!=0.0) {
+	                    getCraft().setLastBlockCheck(0);
+	                }				
+	                getCraft().setLastCruisUpdate(System.currentTimeMillis()-30000);
+	            }
             }
         }
 
@@ -1214,8 +1221,8 @@ public class TranslationTask extends AsyncTask {
                 mat.equals(Material.WOODEN_DOOR)
             || 
                 mat.equals(Material.IRON_DOOR_BLOCK)
-            || 
-                mat.equals(Material.BANNER)
+//            ||                            
+//                mat.equals(Material.BANNER)    // Aparently Material.Banner was removed from the class
         ){
             if (getCraft().getW().getBlockAt( loc.getX(), loc.getY()+1, loc.getZ() ).getType().equals(mat)){
                 MovecraftLocation tmpLoc = loc.translate(0, 1, 0);

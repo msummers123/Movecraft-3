@@ -38,6 +38,7 @@ public class Settings {
 	public static boolean WorldGuardBlockMoveOnBuildPerm = false;
 	public static boolean WorldGuardBlockSinkOnPVPPerm = false;
 	public static boolean DisableCrates = false;
+	public static boolean ProtectPilotedCrafts = false;
 	public static boolean DisableSpillProtection = false;
 	public static boolean RequireCreatePerm = false;
 	public static boolean TNTContactExplosives = true;
@@ -57,6 +58,7 @@ public class Settings {
         public static boolean TownyBlockMoveOnSwitchPerm = false;
         public static boolean TownyBlockSinkOnNoPVP = false;
         public static Map<String, TownyWorldHeightLimits> TownProtectionHeightLimits;
+    public static Map<Integer, Integer> DurabilityOverride;
 
     public static Set<String> SiegeName;
     public static Map<String, String> SiegeRegion;
@@ -69,4 +71,8 @@ public class Settings {
     public static Map<String, String> SiegeControlRegion;
 	public static Map<String, Integer> SiegeDelay;
 	public static Map<String, Integer> SiegeDuration;
+	public static Map<String, Integer> SiegeDayOfTheWeek;
+	public static Map<String, ArrayList<String>> SiegeCommandsOnStart;
+	public static Map<String, ArrayList<String>> SiegeCommandsOnWin;
+	public static Map<String, ArrayList<String>> SiegeCommandsOnLose;
 }

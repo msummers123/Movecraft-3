@@ -192,6 +192,7 @@ public class PlayerListener implements Listener {
 			if ( c.isNotProcessing() && (!MathUtils.playerIsWithinBoundingPolygon( c.getHitBox(), c.getMinX(), c.getMinZ(), MathUtils.bukkit2MovecraftLoc( event.getPlayer().getLocation() ) )) ) {
 
 				if ( !CraftManager.getInstance().getReleaseEvents().containsKey( event.getPlayer() ) && c.getType().getMoveEntities()) {
+					boolean releaseBlocked=false;
 					if(Settings.ManOverBoardTimeout!=0)
 						event.getPlayer().sendMessage( String.format( I18nSupport.getInternationalisedString( "You have left your craft. You may return to your craft by typing /manoverboard any time before the timeout expires" ) ) );						
 					else
@@ -201,18 +202,24 @@ public class PlayerListener implements Listener {
 					} else {
 						String ret=checkCraftBorders(c);
 						if(ret!=null) {
-							event.getPlayer().sendMessage( String.format( I18nSupport.getInternationalisedString( "WARNING! There are blocks near your craft that may merge with the craft "+ret)));						
+							event.getPlayer().sendMessage( String.format( I18nSupport.getInternationalisedString( "WARNING! There are blocks near your craft that may merge with the craft "+ret)));
+							releaseBlocked=true;
 						}
 					}
 					
-					BukkitTask releaseTask = new BukkitRunnable() {
-
-						@Override
-						public void run() {
-							CraftManager.getInstance().removeCraft( c );
-						}
-
-					}.runTaskLater( Movecraft.getInstance(), ( 20 * 30 ) );
+					BukkitTask releaseTask;
+					if(!releaseBlocked) {
+						releaseTask = new BukkitRunnable() {
+	
+							@Override
+							public void run() {
+								CraftManager.getInstance().removeCraft( c );
+							}
+	
+						}.runTaskLater( Movecraft.getInstance(), ( 20 * 30 ) );
+					} else {
+						releaseTask=null; // put the task in as a null just so it doesn't keep pestering the pilot
+					}
 
 					CraftManager.getInstance().getReleaseEvents().put( event.getPlayer(), releaseTask );
 				}
