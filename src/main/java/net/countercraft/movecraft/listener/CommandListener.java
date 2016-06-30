@@ -202,7 +202,12 @@ public class CommandListener implements CommandExecutor {
 			if(args.length>0) {
 				if ( player.hasPermission( "movecraft." + args[0] + ".pilot" ) ) {				
 					MovecraftLocation startPoint = MathUtils.bukkit2MovecraftLoc(player.getLocation());
-					Craft c = new Craft( getCraftTypeFromString( args[0] ), player.getWorld() );
+					CraftType ct = getCraftTypeFromString( args[0] );
+					if (ct == null) {
+						player.sendMessage( String.format( I18nSupport.getInternationalisedString( "Invalid Craft Type" ) ) );
+						return true;
+					}
+					Craft c = new Craft( ct, player.getWorld() );
 		
 					if ( CraftManager.getInstance().getCraftByPlayerName( player.getName() ) == null ) {
 						c.detect( player, player, startPoint );
