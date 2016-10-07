@@ -29,7 +29,9 @@ import org.bukkit.World;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Craft {
@@ -470,5 +472,124 @@ public class Craft {
 	public Player getAADirector() {
 		return AADirector;
 	}
-	
+
+	public MovecraftLocation checkBorders() {
+		HashSet<MovecraftLocation> craftBlocks=new HashSet<MovecraftLocation>(Arrays.asList(getBlockList()));
+		for(MovecraftLocation block : craftBlocks) {
+			int x,y,z;
+			x=block.getX()+1;
+			y=block.getY()+0;
+			z=block.getZ()+0;
+			MovecraftLocation test=new MovecraftLocation(x,y,z);
+			if(!craftBlocks.contains(test))
+				if((Arrays.binarySearch(getType().getAllowedBlocks(), getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(getType().getAllowedBlocks(), (getW().getBlockTypeIdAt(x, y, z)<<4)+getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
+					return test;
+				}
+			x=block.getX()-1;
+			y=block.getY()+0;
+			z=block.getZ()+0;
+			test=new MovecraftLocation(x,y,z);
+			if(!craftBlocks.contains(test))
+				if((Arrays.binarySearch(getType().getAllowedBlocks(), getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(getType().getAllowedBlocks(), (getW().getBlockTypeIdAt(x, y, z)<<4)+getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
+					return test;
+				}
+			x=block.getX()+0;
+			y=block.getY()+1;
+			z=block.getZ()+0;
+			test=new MovecraftLocation(x,y,z);
+			if(!craftBlocks.contains(test))
+				if((Arrays.binarySearch(getType().getAllowedBlocks(), getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(getType().getAllowedBlocks(), (getW().getBlockTypeIdAt(x, y, z)<<4)+getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
+					return test;
+				}
+			x=block.getX()+0;
+			y=block.getY()-1;
+			z=block.getZ()+0;
+			test=new MovecraftLocation(x,y,z);
+			if(!craftBlocks.contains(test))
+				if((Arrays.binarySearch(getType().getAllowedBlocks(), getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(getType().getAllowedBlocks(), (getW().getBlockTypeIdAt(x, y, z)<<4)+getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
+					return test;
+				}
+			x=block.getX()+0;
+			y=block.getY()+0;
+			z=block.getZ()+1;
+			test=new MovecraftLocation(x,y,z);
+			if(!craftBlocks.contains(test))
+				if((Arrays.binarySearch(getType().getAllowedBlocks(), getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(getType().getAllowedBlocks(), (getW().getBlockTypeIdAt(x, y, z)<<4)+getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
+					return test;
+				}
+			x=block.getX()+0;
+			y=block.getY()+0;
+			z=block.getZ()+1;
+			test=new MovecraftLocation(x,y,z);
+			if(!craftBlocks.contains(test))
+				if((Arrays.binarySearch(getType().getAllowedBlocks(), getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(getType().getAllowedBlocks(), (getW().getBlockTypeIdAt(x, y, z)<<4)+getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
+					return test;
+				}
+			x=block.getX()+1;
+			y=block.getY()+1;
+			z=block.getZ()+0;
+			test=new MovecraftLocation(x,y,z);
+			if(!craftBlocks.contains(test))
+				if((Arrays.binarySearch(getType().getAllowedBlocks(), getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(getType().getAllowedBlocks(), (getW().getBlockTypeIdAt(x, y, z)<<4)+getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
+					return test;
+				}
+			x=block.getX()+1;
+			y=block.getY()-1;
+			z=block.getZ()+0;
+			test=new MovecraftLocation(x,y,z);
+			if(!craftBlocks.contains(test))
+				if((Arrays.binarySearch(getType().getAllowedBlocks(), getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(getType().getAllowedBlocks(), (getW().getBlockTypeIdAt(x, y, z)<<4)+getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
+					return test;
+				}
+			x=block.getX()-1;
+			y=block.getY()+1;
+			z=block.getZ()+0;
+			test=new MovecraftLocation(x,y,z);
+			if(!craftBlocks.contains(test))
+				if((Arrays.binarySearch(getType().getAllowedBlocks(), getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(getType().getAllowedBlocks(), (getW().getBlockTypeIdAt(x, y, z)<<4)+getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
+					return test;
+				}
+			x=block.getX()-1;
+			y=block.getY()-1;
+			z=block.getZ()+0;
+			test=new MovecraftLocation(x,y,z);
+			if(!craftBlocks.contains(test))
+				if((Arrays.binarySearch(getType().getAllowedBlocks(), getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(getType().getAllowedBlocks(), (getW().getBlockTypeIdAt(x, y, z)<<4)+getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
+					return test;
+				}
+			x=block.getX()+0;
+			y=block.getY()+1;
+			z=block.getZ()+1;
+			test=new MovecraftLocation(x,y,z);
+			if(!craftBlocks.contains(test))
+				if((Arrays.binarySearch(getType().getAllowedBlocks(), getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(getType().getAllowedBlocks(), (getW().getBlockTypeIdAt(x, y, z)<<4)+getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
+					return test;
+				}
+			x=block.getX()+0;
+			y=block.getY()-1;
+			z=block.getZ()+1;
+			test=new MovecraftLocation(x,y,z);
+			if(!craftBlocks.contains(test))
+				if((Arrays.binarySearch(getType().getAllowedBlocks(), getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(getType().getAllowedBlocks(), (getW().getBlockTypeIdAt(x, y, z)<<4)+getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
+					return test;
+				}
+			x=block.getX()+0;
+			y=block.getY()+1;
+			z=block.getZ()-1;
+			test=new MovecraftLocation(x,y,z);
+			if(!craftBlocks.contains(test))
+				if((Arrays.binarySearch(getType().getAllowedBlocks(), getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(getType().getAllowedBlocks(), (getW().getBlockTypeIdAt(x, y, z)<<4)+getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
+					return test;
+				}
+			x=block.getX()+0;
+			y=block.getY()-1;
+			z=block.getZ()-1;
+			test=new MovecraftLocation(x,y,z);
+			if(!craftBlocks.contains(test))
+				if((Arrays.binarySearch(getType().getAllowedBlocks(), getW().getBlockTypeIdAt(x, y, z))>=0)||(Arrays.binarySearch(getType().getAllowedBlocks(), (getW().getBlockTypeIdAt(x, y, z)<<4)+getW().getBlockAt(x, y, z).getData()+10000)>=0)) {
+					return test;
+				}
+		}
+		return null;
+	}
 }

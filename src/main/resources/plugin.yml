@@ -44,5 +44,6 @@ commands:
   assault:
     description: Begins an Assault on the specified region
     usage: /assault <regionname>
-
-
+  merge?:
+    description: Check if your craft will merge at the current location
+    usage: /merge?

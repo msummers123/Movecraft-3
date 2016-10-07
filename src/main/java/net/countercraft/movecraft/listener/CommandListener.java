@@ -454,7 +454,23 @@ public class CommandListener implements CommandExecutor {
 			}
 			return true;
 		}
-		
+
+		if(cmd.getName().equalsIgnoreCase("merge?")) {
+			final Craft craft = CraftManager.getInstance().getCraftByPlayer(player);
+			if(craft != null ) {
+				final MovecraftLocation block = craft.checkBorders();
+				if(block != null) {
+					final String location = "@ " + block.getX() + "," + block.getY() + "," + block.getZ();
+					player.sendMessage(String.format(I18nSupport.getInternationalisedString( "WARNING! There are blocks near your craft that may merge with the craft " + location)));
+				} else {
+					player.sendMessage(String.format(I18nSupport.getInternationalisedString( "Don't worry, your craft looks fine!")));
+				}
+			} else {
+				player.sendMessage(String.format(I18nSupport.getInternationalisedString("You must be piloting a craft")));
+			}
+			return true;
+		}
+
 		if(cmd.getName().equalsIgnoreCase("assaultinfo")) {
 			if(Settings.AssaultEnable==false) {
 				player.sendMessage( String.format( I18nSupport.getInternationalisedString( "Assault is not enabled" ) ) );
@@ -832,7 +848,7 @@ public class CommandListener implements CommandExecutor {
 				return true;
             }
 		}
-		
+
 		return false;
 	}
 
