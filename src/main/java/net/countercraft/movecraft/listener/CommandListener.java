@@ -18,14 +18,7 @@
 package net.countercraft.movecraft.listener;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 import net.countercraft.movecraft.Movecraft;
@@ -50,6 +43,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -70,7 +64,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 //public class CommandListener implements Listener {
-public class CommandListener implements CommandExecutor {
+public class CommandListener implements CommandExecutor, TabCompleter {
 	
 	private CraftType getCraftTypeFromString(String s) {
 		for (CraftType t : CraftManager.getInstance().getCraftTypes()) {
@@ -834,6 +828,30 @@ public class CommandListener implements CommandExecutor {
 		}
 		
 		return false;
+	}
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+		List<String> result = new ArrayList<String>();
+		if (sender instanceof Player) {
+			Player player = (Player) sender;
+			if (cmd.getName().equalsIgnoreCase("pilot" )) {
+				if (args.length < 2) {
+					final String partialName = args.length == 1 ? args[0].toLowerCase() : "";
+					for (CraftType t : CraftManager.getInstance().getCraftTypes()) {
+						final String craftName = t.getCraftName();
+						if (craftName.toLowerCase().startsWith(partialName) &&
+								player.hasPermission("movecraft." + craftName + ".pilot" )) {
+							result.add(craftName);
+						}
+					}
+				}
+			}
+		} else {
+			sender.sendMessage("This command can only be run by a player.");
+		}
+		Collections.sort(result, String.CASE_INSENSITIVE_ORDER);
+		return result;
 	}
 
 	private boolean areDefendersOnline(ProtectedRegion tRegion) {
