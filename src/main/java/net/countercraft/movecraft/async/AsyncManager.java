@@ -267,14 +267,14 @@ public class AsyncManager extends BukkitRunnable {
 												I18nSupport.getInternationalisedString(
 														"Detection - Success - Log Output"),
 												notifyP.getName(), c.getType().getCraftName(), c.getBlockList().length,
-												c.getMinX(), c.getMinZ(), c.getCargoCapacity()));
+												c.getCargoCapacity(), c.getMinX(), c.getMinZ()));
 							} else {
 								Movecraft.getInstance().getLogger().log(Level.INFO,
 										String.format(
 												I18nSupport.getInternationalisedString(
 														"Detection - Success - Log Output"),
 												"NULL PLAYER", c.getType().getCraftName(), c.getBlockList().length,
-												c.getMinX(), c.getMinZ(), c.getCargoCapacity()));
+												c.getCargoCapacity(), c.getMinX(), c.getMinX(), c.getMinZ()));
 							}
 							CraftManager.getInstance().addCraft(c, p);
 						}
