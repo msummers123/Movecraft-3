@@ -39,6 +39,7 @@ public class Craft {
 	private World w;
 	private AtomicBoolean processing = new AtomicBoolean();
 	private int minX, minZ, maxHeightLimit;
+	private int cargoCapacity;
 	private boolean cruising;
 	private boolean sinking;
 	private boolean disabled;
@@ -306,7 +307,15 @@ public class Craft {
 	public void setMinZ( int minZ ) {
 		this.minZ = minZ;
 	}
-	
+
+	public int getCargoCapacity() {
+		return cargoCapacity;
+	}
+
+	public void setCargoCapacity(int cargoCapacity) {
+		this.cargoCapacity = cargoCapacity;
+	}
+
 	public boolean getCruising() {
 		return cruising;
 	}
