@@ -205,7 +205,11 @@ public class CraftType {
 		craftName = ( String ) data.get( "name" );
 		maxSize = integerFromObject(data.get( "maxSize" ));
 		minSize = integerFromObject(data.get( "minSize" ));
-		maxCargoCapacity = integerFromObject(data.get("maxCargoCapacity"));
+		if (data.containsKey("maxCargoCapacity")){
+			maxCargoCapacity = integerFromObject(data.get("maxCargoCapacity"));
+		}else{
+			maxCargoCapacity = -1;
+		}
 
 //		allowedBlocks = ((ArrayList<String> ) data.get( "allowedBlocks" )).toArray( new Integer[1] );
 		allowedBlocks = blockIDListFromObject(data.get( "allowedBlocks" ));

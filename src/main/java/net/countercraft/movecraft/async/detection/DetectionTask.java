@@ -516,7 +516,7 @@ public class DetectionTask extends AsyncTask {
 			}
 		}
 		int maxCargoCapacity = getCraft().getType().getMaxCargoCapacity();
-		if (this.cargoCapacity > maxCargoCapacity) {
+		if (maxCargoCapacity != -1 && this.cargoCapacity > maxCargoCapacity) {
 			fail(String.format(
 					I18nSupport.getInternationalisedString("Too much cargo capacity") + ": %d > %d",
 					this.cargoCapacity, maxCargoCapacity));
