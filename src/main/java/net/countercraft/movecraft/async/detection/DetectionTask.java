@@ -68,6 +68,7 @@ public class DetectionTask extends AsyncTask {
 
 	private int craftMinY = 0;
 	private int craftMaxY = 0;
+	private int cargoCapacity = 0;
 	private boolean townyEnabled = false;
 	Set<TownBlock> townBlockSet = new HashSet<TownBlock>();
 	TownyWorld townyWorld = null;
@@ -143,6 +144,7 @@ public class DetectionTask extends AsyncTask {
 			if (confirmStructureRequirements(flyBlocks, blockTypeCount)) {
 				data.setHitBox(BoundingBoxUtils.formBoundingBox(data.getBlockList(), data.getMinX(), maxX,
 						data.getMinZ(), maxZ));
+				data.setCargoCapacity(this.cargoCapacity);
 
 			}
 
@@ -191,6 +193,15 @@ public class DetectionTask extends AsyncTask {
 						}
 					}
 				}
+			}
+			if (testID == 54 || testID == 146) { // Chest, Trapped Chest
+				this.cargoCapacity += 27;
+			} else if (testID == 23 || testID == 158) { // Dispenser, Hopper
+				this.cargoCapacity += 9;
+			} else if (testID == 61 || testID == 145) { // Furnace, Anvil
+				this.cargoCapacity += 2;
+			} else if (testID == 154) { // Hopper
+				this.cargoCapacity += 5;
 			}
 			if (isForbiddenBlock(testID, testData)) {
 				fail(String.format(I18nSupport.getInternationalisedString("Detection - Forbidden block found")));
@@ -503,6 +514,13 @@ public class DetectionTask extends AsyncTask {
 						.getInternationalisedString("Detection - Failed - Water contact required but not found")));
 				return false;
 			}
+		}
+		int maxCargoCapacity = getCraft().getType().getMaxCargoCapacity();
+		if (maxCargoCapacity != -1 && this.cargoCapacity > maxCargoCapacity) {
+			fail(String.format(
+					I18nSupport.getInternationalisedString("Too much cargo capacity") + ": %d > %d",
+					this.cargoCapacity, maxCargoCapacity));
+			return false;
 		}
 		for (ArrayList<Integer> i : flyBlocks.keySet()) {
 			Integer numberOfBlocks = countData.get(i);

@@ -34,6 +34,7 @@ public class DetectionTaskData {
 	private Integer minX, minZ;
 	private Integer[] allowedBlocks, forbiddenBlocks;
 	private String[] forbiddenSignStrings;
+	private int cargoCapacity = 0;
 
 	public DetectionTaskData( World w, Player player, Player notificationPlayer, Integer[] allowedBlocks, Integer[] forbiddenBlocks, String[] forbiddenSignStrings) {
 		this.w = w;
@@ -122,6 +123,14 @@ public class DetectionTaskData {
 
 	void setMinZ( Integer minZ ) {
 		this.minZ = minZ;
+	}
+
+	public int getCargoCapacity() {
+		return cargoCapacity;
+	}
+
+	public void setCargoCapacity(int cargoCapacity) {
+		this.cargoCapacity = cargoCapacity;
 	}
 
 	void setFailed( boolean failed ) {

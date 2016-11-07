@@ -65,6 +65,7 @@ public class CraftType {
 	private HashMap<ArrayList<Integer>, ArrayList<Double>> flyBlocks = new HashMap<ArrayList<Integer>, ArrayList<Double>>();
 	private HashMap<ArrayList<Integer>, ArrayList<Double>> moveBlocks = new HashMap<ArrayList<Integer>, ArrayList<Double>>();
 	private int hoverLimit;
+	private int maxCargoCapacity;
 	private List<Material> harvestBlocks;
         private List<Material> harvesterBladeBlocks;
 	        
@@ -204,6 +205,12 @@ public class CraftType {
 		craftName = ( String ) data.get( "name" );
 		maxSize = integerFromObject(data.get( "maxSize" ));
 		minSize = integerFromObject(data.get( "minSize" ));
+		if (data.containsKey("maxCargoCapacity")){
+			maxCargoCapacity = integerFromObject(data.get("maxCargoCapacity"));
+		}else{
+			maxCargoCapacity = -1;
+		}
+
 //		allowedBlocks = ((ArrayList<String> ) data.get( "allowedBlocks" )).toArray( new Integer[1] );
 		allowedBlocks = blockIDListFromObject(data.get( "allowedBlocks" ));
 		Arrays.sort(allowedBlocks);
@@ -642,7 +649,11 @@ public class CraftType {
   	public int getHoverLimit(){
     	return hoverLimit;
   	}
-    	  
+
+	public int getMaxCargoCapacity(){
+		return maxCargoCapacity;
+	}
+
 	public List<Material> getHarvestBlocks() {
     	return harvestBlocks;
    	}

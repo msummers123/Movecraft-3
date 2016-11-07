@@ -114,9 +114,9 @@ public class CraftManager {
 		craftList.get( c.getW() ).remove( c );
 		if ( getPlayerFromCraft( c ) != null ) {
 			getPlayerFromCraft( c ).sendMessage( String.format( I18nSupport.getInternationalisedString( "Release - Craft has been released message" ) ) );
-			Movecraft.getInstance().getLogger().log( Level.INFO, String.format( I18nSupport.getInternationalisedString( "Release - Player has released a craft console" ), c.getNotificationPlayer().getName(), c.getType().getCraftName(), c.getBlockList().length, c.getMinX(), c.getMinZ() ) );
+			Movecraft.getInstance().getLogger().log( Level.INFO, String.format( I18nSupport.getInternationalisedString( "Release - Player has released a craft console" ), c.getNotificationPlayer().getName(), c.getType().getCraftName(), c.getBlockList().length, c.getCargoCapacity(), c.getMinX(), c.getMinZ() ) );
 		} else {
-			Movecraft.getInstance().getLogger().log( Level.INFO, String.format( I18nSupport.getInternationalisedString( "NULL Player has released a craft of type %s with size %d at coordinates : %d x , %d z" ),  c.getType().getCraftName(), c.getBlockList().length, c.getMinX(), c.getMinZ() ) );
+			Movecraft.getInstance().getLogger().log( Level.INFO, String.format( I18nSupport.getInternationalisedString( "NULL Player has released a craft of type %s with size %d and cargo capacity %d at coordinates : %d x , %d z" ),  c.getType().getCraftName(), c.getBlockList().length, c.getCargoCapacity(), c.getMinX(), c.getMinZ() ) );
 		}
 		craftPlayerIndex.remove( getPlayerFromCraft( c ) );
 	}
