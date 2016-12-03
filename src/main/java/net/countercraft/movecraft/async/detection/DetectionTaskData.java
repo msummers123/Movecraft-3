@@ -81,7 +81,11 @@ public class DetectionTaskData {
 	}
 
 	void setFailMessage( String failMessage ) {
-		this.failMessage = failMessage;
+		if (this.failMessage == null) {
+			this.failMessage = failMessage;
+		} else {
+			this.failMessage += '\n' + failMessage;
+		}
 	}
 
 	public MovecraftLocation[] getBlockList() {

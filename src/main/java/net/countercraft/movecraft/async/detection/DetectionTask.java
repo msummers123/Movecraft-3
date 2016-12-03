@@ -22,7 +22,6 @@ import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownyWorld;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.StateFlag;
 
 import net.countercraft.movecraft.async.AsyncTask;
 import net.countercraft.movecraft.craft.Craft;
@@ -48,7 +47,6 @@ import net.countercraft.movecraft.utils.TownyUtils;
 import net.countercraft.movecraft.utils.TownyWorldHeightLimits;
 import net.countercraft.movecraft.utils.WGCustomFlagsUtils;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 public class DetectionTask extends AsyncTask {
@@ -504,80 +502,96 @@ public class DetectionTask extends AsyncTask {
 				return false;
 			}
 		}
-		for (ArrayList<Integer> i : flyBlocks.keySet()) {
-			Integer numberOfBlocks = countData.get(i);
 
+		int totalNumberOfBlocks = data.getBlockList().length;
+		boolean result = true;
+
+		ArrayList<Integer> flyBlocksToSkip = null;
+		if (Settings.ExchangeDispensersForChests) {
+			// Special treatment for chests: Allows extra chests at the expense of dispensers.
+			ArrayList<Integer> chests = null;
+			ArrayList<Integer> dispensers = null;
+			for (ArrayList<Integer> i : flyBlocks.keySet()) {
+				if (i.contains(/* Chest */ 54)) {
+					chests = i;
+				} else if (i.contains(/* Dispenser */ 23)) {
+					dispensers = i;
+				}
+			}
+
+			if (chests != null && dispensers != null && countData.containsKey(chests)) {
+				final double minPercentageOfDispensers = flyBlocks.get(dispensers).get(0);
+				final double maxPercentageOfDispensers = flyBlocks.get(dispensers).get(1);
+				final int numberOfDispensers = countData.containsKey(dispensers) ? countData.get(dispensers) : 0;
+				if (isBetweenFlyBlockLimits(/* Dispenser */ 23, numberOfDispensers, totalNumberOfBlocks,
+										 minPercentageOfDispensers, maxPercentageOfDispensers) ) {
+					final int numberOfChests = countData.get(chests);
+					final double minPercentageOfChests = flyBlocks.get(chests).get(0);
+					final int minNumberOfChests = computeFlyBlocksCount(totalNumberOfBlocks, minPercentageOfChests);
+					if (numberOfChests >= minNumberOfChests) {
+						final double maxPercentageOfChests = flyBlocks.get(chests).get(1);
+						final int maxNumberOfChests = computeFlyBlocksCount(totalNumberOfBlocks, maxPercentageOfChests);
+						final int maxNumberOfDispensers = computeFlyBlocksCount(totalNumberOfBlocks, maxPercentageOfDispensers);
+						final int extraChests = (maxNumberOfDispensers - numberOfDispensers) / 3;  // 3 dispensers == 1 chest
+						if (numberOfChests > maxNumberOfChests + extraChests) {
+							fail(String.format(
+									I18nSupport.getInternationalisedString("Too much flyblock") +
+									": chest -> %d > %d (%.2f%% of %d) + %d %s (in exchange for %d dispensers)",
+									numberOfChests, maxNumberOfChests, maxPercentageOfChests, totalNumberOfBlocks,
+									extraChests, extraChests == 1 ? "extra" : "extras",
+									maxNumberOfDispensers - numberOfDispensers));
+							result = false;
+						}
+						flyBlocksToSkip = chests;
+					}
+				}
+			}
+		}
+
+		for (ArrayList<Integer> i : flyBlocks.keySet()) {
+			if (i == flyBlocksToSkip) {
+				continue;
+			}
+			final double minPercentage = flyBlocks.get(i).get(0);
+			final double maxPercentage = flyBlocks.get(i).get(1);
+			Integer numberOfBlocks = countData.get(i);
 			if (numberOfBlocks == null) {
 				numberOfBlocks = 0;
 			}
+			if (!isBetweenFlyBlockLimits(i.get(0), numberOfBlocks, totalNumberOfBlocks, minPercentage, maxPercentage)) {
+				result = false;
+			}
+		}
+		return result;
+	}
 
-			float blockPercentage = (((float) numberOfBlocks / data.getBlockList().length) * 100);
-			Double minPercentage = flyBlocks.get(i).get(0);
-			Double maxPercentage = flyBlocks.get(i).get(1);
-			if (minPercentage < 10000.0) {
-				if (blockPercentage < minPercentage) {
-					if (i.get(0) < 10000) {
-						fail(String.format(
-								I18nSupport.getInternationalisedString("Not enough flyblock") + ": %s %.2f%% < %.2f%%",
-								Material.getMaterial(i.get(0)).name().toLowerCase().replace("_", " "), blockPercentage,
-								minPercentage));
-						return false;
-					} else {
-						fail(String.format(
-								I18nSupport.getInternationalisedString("Not enough flyblock") + ": %s %.2f%% < %.2f%%",
-								Material.getMaterial((i.get(0) - 10000) >> 4).name().toLowerCase().replace("_", " "),
-								blockPercentage, minPercentage));
-						return false;
-					}
-				}
-			} else {
-				if (numberOfBlocks < flyBlocks.get(i).get(0) - 10000.0) {
-					if (i.get(0) < 10000) {
-						fail(String.format(
-								I18nSupport.getInternationalisedString("Not enough flyblock") + ": %s %d < %d",
-								Material.getMaterial(i.get(0)).name().toLowerCase().replace("_", " "), numberOfBlocks,
-								flyBlocks.get(i).get(0).intValue() - 10000));
-						return false;
-					} else {
-						fail(String.format(
-								I18nSupport.getInternationalisedString("Not enough flyblock") + ": %s %d < %d",
-								Material.getMaterial((i.get(0) - 10000) >> 4).name().toLowerCase().replace("_", " "),
-								numberOfBlocks, flyBlocks.get(i).get(0).intValue() - 10000));
-						return false;
-					}
-				}
-			}
-			if (maxPercentage < 10000.0) {
-				if (blockPercentage > maxPercentage) {
-					if (i.get(0) < 10000) {
-						fail(String.format(
-								I18nSupport.getInternationalisedString("Too much flyblock") + ": %s %.2f%% > %.2f%%",
-								Material.getMaterial(i.get(0)).name().toLowerCase().replace("_", " "), blockPercentage,
-								maxPercentage));
-						return false;
-					} else {
-						fail(String.format(
-								I18nSupport.getInternationalisedString("Too much flyblock") + ": %s %.2f%% > %.2f%%",
-								Material.getMaterial((i.get(0) - 10000) >> 4).name().toLowerCase().replace("_", " "),
-								blockPercentage, maxPercentage));
-						return false;
-					}
-				}
-			} else {
-				if (numberOfBlocks > flyBlocks.get(i).get(1) - 10000.0) {
-					if (i.get(0) < 10000) {
-						fail(String.format(I18nSupport.getInternationalisedString("Too much flyblock") + ": %s %d > %d",
-								Material.getMaterial(i.get(0)).name().toLowerCase().replace("_", " "), numberOfBlocks,
-								flyBlocks.get(i).get(1).intValue() - 10000));
-						return false;
-					} else {
-						fail(String.format(I18nSupport.getInternationalisedString("Too much flyblock") + ": %s %d > %d",
-								Material.getMaterial((i.get(0) - 10000) >> 4).name().toLowerCase().replace("_", " "),
-								numberOfBlocks, flyBlocks.get(i).get(1).intValue() - 10000));
-						return false;
-					}
-				}
-			}
+	private int computeFlyBlocksCount(int totalNumberOfBlocks, double percentage) {
+		if (percentage >= 10000.0) {
+			return (int)percentage - 10000;
+		}
+		return (int)(totalNumberOfBlocks * percentage / 100.0);
+	}
+
+	private boolean isBetweenFlyBlockLimits(int flyBlockID, int numberOfBlocks, int totalNumberOfBlocks,
+											double minPercentage, double maxPercentage) {
+		if (flyBlockID >= 10000) {
+			flyBlockID = (flyBlockID - 10000) >> 4;
+		}
+
+		final int minNumberOfBlocks = computeFlyBlocksCount(totalNumberOfBlocks, minPercentage);
+		if (numberOfBlocks < minNumberOfBlocks) {
+			fail(String.format(I18nSupport.getInternationalisedString("Not enough flyblock") + ": %s -> %d < %d (%.2f%% of %d)",
+				Material.getMaterial(flyBlockID).name().toLowerCase().replace("_", " "),
+				numberOfBlocks, minNumberOfBlocks, minPercentage, totalNumberOfBlocks));
+			return false;
+		}
+
+		final int maxNumberOfBlocks = computeFlyBlocksCount(totalNumberOfBlocks, maxPercentage);
+		if (numberOfBlocks > maxNumberOfBlocks) {
+			fail(String.format(I18nSupport.getInternationalisedString("Too much flyblock") + ": %s -> %d > %d (%.2f%% of %d)",
+				Material.getMaterial(flyBlockID).name().toLowerCase().replace("_", " "),
+				numberOfBlocks, maxNumberOfBlocks, maxPercentage, totalNumberOfBlocks));
+			return false;
 		}
 
 		return true;
