@@ -1,3 +1,4 @@
+
 /*
  * This file is part of Movecraft.
  *
@@ -25,8 +26,6 @@ import net.countercraft.movecraft.async.translation.TranslationTask;
 import net.countercraft.movecraft.config.Settings;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
-import net.countercraft.movecraft.listener.CommandListener;
-import net.countercraft.movecraft.listener.WorldEditInteractListener;
 import net.countercraft.movecraft.localisation.I18nSupport;
 import net.countercraft.movecraft.utils.BlockUtils;
 import net.countercraft.movecraft.utils.EntityUpdateCommand;
@@ -38,17 +37,15 @@ import net.countercraft.movecraft.utils.MovecraftLocation;
 
 import org.apache.commons.collections.ListUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -63,7 +60,6 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import java.util.ArrayList;
@@ -74,7 +70,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -97,7 +92,6 @@ public class AsyncManager extends BukkitRunnable {
 	private long lastTNTContactCheck = 0;
 	private long lastFadeCheck = 0;
 	private long lastContactCheck = 0;
-	private long lastAssaultCheck = 0;
 	private long lastSiegeNotification = 0;
 	private long lastSiegePayout = 0;
 	private HashSet<Material> transparent = null;
@@ -626,7 +620,7 @@ public class AsyncManager extends BukkitRunnable {
 					}
 				}
 				// check every few seconds for every craft to see if it should
-				// be sinking or disabled
+				// be sinking
 				for (Craft pcraft : CraftManager.getInstance().getCraftsInWorld(w)) {
 					Set<TownBlock> townBlockSet = new HashSet<TownBlock>();
 					if (pcraft != null && pcraft.getSinking() == false) {
@@ -637,7 +631,7 @@ public class AsyncManager extends BukkitRunnable {
 								int totalNonAirBlocks = 0;
 								int totalNonAirWaterBlocks = 0;
 								HashMap<ArrayList<Integer>, Integer> foundFlyBlocks = new HashMap<ArrayList<Integer>, Integer>();
-								HashMap<ArrayList<Integer>, Integer> foundMoveBlocks = new HashMap<ArrayList<Integer>, Integer>();
+								HashMap<ArrayList<Integer>, Integer> foundWeightBlocks = new HashMap<ArrayList<Integer>, Integer>();
 								boolean regionPVPBlocked = false;
 								boolean sinkingForbiddenByFlag = false;
 								boolean sinkingForbiddenByTowny = false;
@@ -669,18 +663,6 @@ public class AsyncManager extends BukkitRunnable {
 											}
 										}
 									}
-									if(pcraft.getType().getMoveBlocks()!=null) {
-										for (ArrayList<Integer> moveBlockDef : pcraft.getType().getMoveBlocks().keySet()) {
-											if (moveBlockDef.contains(blockID) || moveBlockDef.contains(shiftedID)) {
-												Integer count = foundMoveBlocks.get(moveBlockDef);
-												if (count == null) {
-													foundMoveBlocks.put(moveBlockDef, 1);
-												} else {
-													foundMoveBlocks.put(moveBlockDef, count + 1);
-												}
-											}
-										}
-									}
 
 									if (blockID != 0) {
 										totalNonAirBlocks++;
@@ -688,13 +670,27 @@ public class AsyncManager extends BukkitRunnable {
 									if (blockID != 0 && blockID != 8 && blockID != 9) {
 										totalNonAirWaterBlocks++;
 									}
+									if (blockID == 54 || blockID == 23 || blockID == 146) {
+										InventoryHolder inventory = (InventoryHolder) w.getBlockAt(l.getX(), l.getY(), l.getZ()).getState();
+										for (ArrayList<Integer> weightBlockDef : pcraft.getType().getWeightBlocks().keySet()) {
+											for (Integer item : weightBlockDef) {
+												if (inventory.getInventory().contains(item)) {
+													Integer count = foundWeightBlocks.get(weightBlockDef);
+													if (count == null) {
+														foundWeightBlocks.put(weightBlockDef, 1);
+													} else {
+														foundWeightBlocks.put(weightBlockDef, count + 1);
+													}
+												}
+											}
+										}
+									}
 								}
 
 								// now see if any of the resulting percentages
 								// are below the threshold specified in
 								// SinkPercent
 								boolean isSinking = false;
-
 								for (ArrayList<Integer> i : pcraft.getType().getFlyBlocks().keySet()) {
 									int numfound = 0;
 									if (foundFlyBlocks.get(i) != null) {
@@ -706,26 +702,23 @@ public class AsyncManager extends BukkitRunnable {
 									if (percent < sinkPercent) {
 										isSinking = true;
 									}
-									
+
 								}
-								if(pcraft.getType().getMoveBlocks()!=null) {
-									for (ArrayList<Integer> i : pcraft.getType().getMoveBlocks().keySet()) {
-										int numfound = 0;
-										if (foundMoveBlocks.get(i) != null) {
-											numfound = foundMoveBlocks.get(i);
-										}
-										double percent = ((double) numfound / (double) totalNonAirBlocks) * 100.0;
-										double movePercent = pcraft.getType().getMoveBlocks().get(i).get(0);
-										double disablePercent = movePercent * pcraft.getType().getSinkPercent() / 100.0;
-										if (percent < disablePercent && pcraft.getDisabled()==false && pcraft.isNotProcessing()) {
-											pcraft.setDisabled(true);
-											if(pcraft.getNotificationPlayer()!=null) {
-												Location loc = pcraft.getNotificationPlayer().getLocation();
-								            	pcraft.getW().playSound(loc,Sound.ENTITY_IRONGOLEM_DEATH,5.0f, 5.0f);  
-											}
-										}
+								//As well as weight
+								for (ArrayList<Integer> i : pcraft.getType().getWeightBlocks().keySet()) {
+									int numfound = 0;
+									if(foundWeightBlocks.get(i) != null) {
+										numfound = foundWeightBlocks.get(i);
 									}
-										
+									double percent = ((double) numfound / (double) totalNonAirBlocks) * 100;
+									double weightPercent = pcraft.getType().getWeightBlocks().get(i);
+									if (percent > weightPercent) {
+										pcraft.getNotificationPlayer().sendMessage("Your craft has been released because it has become too heavy.");
+										Player p = CraftManager.getInstance().getPlayerFromCraft(pcraft);
+										pcraft.setCruising(false);
+										pcraft.setKeepMoving(false);
+										CraftManager.getInstance().removeCraft(pcraft);
+									}
 								}
 
 								// And check the overallsinkpercent
@@ -1133,20 +1126,7 @@ public class AsyncManager extends BukkitRunnable {
 								long secsElapsed = (System.currentTimeMillis()
 										- Movecraft.getInstance().blockFadeTimeMap.get(loc)) / 1000;
 								// has enough time passed to fade the block?
-								boolean timeElapsed=false;
-								// make containers take longer to fade so their loot can be recovered
-								if(w.getBlockTypeIdAt(loc.getX(), loc.getY(),loc.getZ())==54) {
-									timeElapsed=secsElapsed > Settings.FadeWrecksAfter*5;
-								} else if(w.getBlockTypeIdAt(loc.getX(), loc.getY(),loc.getZ())==146) {
-									timeElapsed=secsElapsed > Settings.FadeWrecksAfter*5;
-								} else if(w.getBlockTypeIdAt(loc.getX(), loc.getY(),loc.getZ())==158) {
-									timeElapsed=secsElapsed > Settings.FadeWrecksAfter*5;
-								} else if(w.getBlockTypeIdAt(loc.getX(), loc.getY(),loc.getZ())==23) {
-									timeElapsed=secsElapsed > Settings.FadeWrecksAfter*5;
-								} else {
-									timeElapsed=secsElapsed > Settings.FadeWrecksAfter;									
-								}
-								if (timeElapsed) {
+								if (secsElapsed > Settings.FadeWrecksAfter) {
 									// load the chunk if it hasn't been already
 									int cx = loc.getX() >> 4;
 									int cz = loc.getZ() >> 4;
@@ -1351,29 +1331,27 @@ public class AsyncManager extends BukkitRunnable {
 						DefaultDomain newMember = new DefaultDomain();
 						newOwner.addPlayer(Movecraft.getInstance().currentSiegePlayer);
 						controlRegion.setMembers(newMember);
-						if(Settings.SiegeCommandsOnWin.get(Movecraft.getInstance().currentSiegeName)!=null) 
-							for (String command : Settings.SiegeCommandsOnWin
-									.get(Movecraft.getInstance().currentSiegeName)) {
-								command.replace("%r", Settings.SiegeRegion.get(Movecraft.getInstance().currentSiegeName));
-								command.replace("%c",
-										Settings.SiegeCost.get(Movecraft.getInstance().currentSiegeName).toString());
-								command.replace("%w", siegeLeader.toString());
-								Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
-							}
+						for (String command : Settings.SiegeCommandsOnWin
+								.get(Movecraft.getInstance().currentSiegeName)) {
+							command.replace("%r", Settings.SiegeRegion.get(Movecraft.getInstance().currentSiegeName));
+							command.replace("%c",
+									Settings.SiegeCost.get(Movecraft.getInstance().currentSiegeName).toString());
+							command.replace("%w", siegeLeader.toString());
+							Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+						}
 					} else {
 						Bukkit.getServer()
 								.broadcastMessage(String.format(
 										"The Siege of %s has failed! The forces of %s have been crushed!",
 										Movecraft.getInstance().currentSiegeName, siegeLeader.getDisplayName()));
-						if(Settings.SiegeCommandsOnLose.get(Movecraft.getInstance().currentSiegeName)!=null)
-							for (String command : Settings.SiegeCommandsOnLose
-									.get(Movecraft.getInstance().currentSiegeName)) {
-								command.replace("%r", Settings.SiegeRegion.get(Movecraft.getInstance().currentSiegeName));
-								command.replace("%c",
-										Settings.SiegeCost.get(Movecraft.getInstance().currentSiegeName).toString());
-								command.replace("%l", siegeLeader.toString());
-								Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
-							}
+						for (String command : Settings.SiegeCommandsOnLose
+								.get(Movecraft.getInstance().currentSiegeName)) {
+							command.replace("%r", Settings.SiegeRegion.get(Movecraft.getInstance().currentSiegeName));
+							command.replace("%c",
+									Settings.SiegeCost.get(Movecraft.getInstance().currentSiegeName).toString());
+							command.replace("%l", siegeLeader.toString());
+							Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+						}
 					}
 					Movecraft.getInstance().currentSiegeName = null;
 					Movecraft.getInstance().siegeInProgress = false;
@@ -1407,98 +1385,6 @@ public class AsyncManager extends BukkitRunnable {
 			}
 		}
 	}
-	
-	public void processAssault() {
-		long ticksElapsed = (System.currentTimeMillis() - lastAssaultCheck) / 50;
-		if(ticksElapsed>19) {
-			Iterator assaultI=Movecraft.getInstance().assaultsRunning.iterator();
-			while(assaultI.hasNext()) {
-				String assault=(String) assaultI.next();
-				String assaultStarter=Movecraft.getInstance().assaultStarter.get(assault);
-				World w=Movecraft.getInstance().assaultWorlds.get(assault);
-				if(Movecraft.getInstance().assaultDamages.get(assault)>=Movecraft.getInstance().assaultMaxDamages.get(assault)) {
-					// assault was successful 
-					Bukkit.getServer().broadcastMessage(String.format("The assault of %s was successful!",assault));
-        			ProtectedRegion tRegion=Movecraft.getInstance().getWorldGuardPlugin().getRegionManager(w).getRegion(assault);
-        			tRegion.setFlag(DefaultFlag.TNT,State.DENY);
-        			
-        			//first, find a position for the repair beacon
-        			int beaconX=Movecraft.getInstance().assaultDamagablePartMin.get(assault).getBlockX();
-        			int beaconZ=Movecraft.getInstance().assaultDamagablePartMin.get(assault).getBlockZ();
-        			int beaconY=w.getHighestBlockAt(beaconX, beaconZ).getY();
-        			int x,y,z;
-        			for(x=beaconX; x<beaconX+5; x++)
-        				for(z=beaconZ; z<beaconZ+5; z++)
-        					if(!w.isChunkLoaded(x>>4, z>>z))
-        						w.loadChunk(x>>4, z>>4);
-        			boolean empty=false;
-        			while(!empty && beaconY<250) {
-        				empty=true;
-        				beaconY++;
-        				for(x=beaconX; x<beaconX+5; x++) {
-        					for(y=beaconY; y<beaconY+4; y++) {
-        						for(z=beaconZ; z<beaconZ+5; z++) {
-        							if(!w.getBlockAt(x, y, z).isEmpty())
-        								empty=false;
-        						}
-        					}
-        				}
-        			}
-        			
-        			//now make the beacon
-        			y=beaconY;
-        			for(x=beaconX+1;x<beaconX+4;x++)
-        				for(z=beaconZ+1;z<beaconZ+4;z++)
-        					w.getBlockAt(x, y, z).setType(Material.BEDROCK);
-        			y=beaconY+1;
-        			for(x=beaconX;x<beaconX+5;x++)
-        				for(z=beaconZ;z<beaconZ+5;z++)
-        					if(x==beaconX||z==beaconZ||x==beaconX+4||z==beaconZ+4)
-        						w.getBlockAt(x, y, z).setType(Material.BEDROCK);
-        					else
-        						w.getBlockAt(x, y, z).setType(Material.IRON_BLOCK);
-        			y=beaconY+2;
-        			for(x=beaconX+1;x<beaconX+4;x++)
-        				for(z=beaconZ+1;z<beaconZ+4;z++)
-        					w.getBlockAt(x, y, z).setType(Material.BEDROCK);
-        			w.getBlockAt(beaconX+2, beaconY+2, beaconZ+2).setType(Material.BEACON);
-        			w.getBlockAt(beaconX+2, beaconY+3, beaconZ+2).setType(Material.BEDROCK);
-        			// finally the sign on the beacon
-        			w.getBlockAt(beaconX+2, beaconY+3, beaconZ+1).setType(Material.WALL_SIGN);
-        			Sign s=(Sign)w.getBlockAt(beaconX+2, beaconY+3, beaconZ+1).getState();
-        			s.setLine(0, ChatColor.RED+"REGION DAMAGED!");
-        			CommandListener executor=new CommandListener();
-        			s.setLine(1, "Region:"+assault);
-        			s.setLine(2, "Damage:"+Movecraft.getInstance().assaultDamages.get(assault));
-        			Calendar rightNow = Calendar.getInstance(TimeZone.getTimeZone("MST"));
-        			s.setLine(3, "Owner:"+executor.getRegionOwnerList(tRegion));
-        			s.update();
-                    ProtectedRegion aRegion = Movecraft.getInstance().getWorldGuardPlugin().getRegionManager(w).getRegion(assault);
-        			tRegion.getOwners().clear();
-					assaultI.remove();
-				} else {
-					// assault was not successful
-					long elapsed=System.currentTimeMillis() - Movecraft.getInstance().assaultStartTime.get(assault);
-					if(elapsed>Settings.AssaultDuration*1000) {
-						// assault has failed to reach damage cap within required time
-						Bukkit.getServer().broadcastMessage(String.format("The assault of %s has failed!",assault));
-	        			ProtectedRegion tRegion=Movecraft.getInstance().getWorldGuardPlugin().getRegionManager(w).getRegion(assault);
-	        			tRegion.setFlag(DefaultFlag.TNT,State.DENY);
-						// repair the damages that have occurred so far
-	        			WorldEditInteractListener executor=new WorldEditInteractListener();
-	        			if(executor.repairRegion(w, assault)==false) {
-							Bukkit.getServer().broadcastMessage(String.format("REPAIR OF %s FAILED, CONTACT AN ADMIN",assault));
-	        			}
-						assaultI.remove();
-					}
-				}
-
-					
-			}
-			lastAssaultCheck=System.currentTimeMillis();
-		}
-
-	}
 
 	public void run() {
 		clearAll();
@@ -1520,7 +1406,6 @@ public class AsyncManager extends BukkitRunnable {
 		processFadingBlocks();
 		processDetection();
 		processSiege();
-		processAssault();
 		processAlgorithmQueue();
 		FastBlockChanger.getInstance().run();
 		// now cleanup craft that are bugged and have not moved in the past 60 seconds, but have no pilot

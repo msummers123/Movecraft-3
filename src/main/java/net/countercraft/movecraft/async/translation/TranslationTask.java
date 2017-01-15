@@ -118,14 +118,20 @@ public class TranslationTask extends AsyncTask {
             int minX=getCraft().getMinX();
             int minZ=getCraft().getMinZ();
 		
+/*		// Load any chunks that you are moving into that are not loaded 
+		for (int posX=minX+data.getDx();posX<=maxX+data.getDx();posX++) {
+			for (int posZ=minZ+data.getDz();posZ<=maxZ+data.getDz();posZ++) {
+				if(getCraft().getW().isChunkLoaded(posX>>4, posZ>>4) == false) {
+					getCraft().getW().loadChunk(posX>>4, posZ>>4);
+				}
+			}
+		}*/
+		
             // treat sinking crafts specially
             if(getCraft().getSinking()) {
                     waterCraft=true;
                     hoverCraft=false;
-            }
-            
-            if(getCraft().getDisabled() && (!getCraft().getSinking())) {
-            	fail( String.format( I18nSupport.getInternationalisedString( "Craft is disabled!" ) ) );					
+//			Movecraft.getInstance().getLogger().log( Level.INFO, "Translation task at: "+System.currentTimeMillis() );
             }
 		
             // check the maxheightaboveground limitation, move 1 down if that limit is exceeded
@@ -561,9 +567,6 @@ public class TranslationTask extends AsyncTask {
                                     fail( String.format( I18nSupport.getInternationalisedString( "Towny - Translation Failed") + " %s @ %d,%d,%d", townName, oldLoc.getX(), oldLoc.getY(), oldLoc.getZ() ));
                                 }else{
                                     fail( String.format( I18nSupport.getInternationalisedString( "Translation - Failed Craft is obstructed" )+" @ %d,%d,%d,%s", oldLoc.getX(), oldLoc.getY(), oldLoc.getZ(), getCraft().getW().getBlockAt(newLoc.getX(),newLoc.getY(), newLoc.getZ()).getType().toString()) );
-                                    if(getCraft().getNotificationPlayer()!=null) {
-                        	            Location location = getCraft().getNotificationPlayer().getLocation();
-                                    }
                                 }
                                 break;
                             }else if(explosionBlockedByTowny){
@@ -573,12 +576,7 @@ public class TranslationTask extends AsyncTask {
                                     data.setCollisionExplosion(true);
                                 }
                             } else {
-                            	int explosionKey;
-                            	if(oldLoc.getY()<waterLine) { // underwater explosions require more force to do anything
-                                	explosionKey =  (int) (0-((getCraft().getType().getCollisionExplosion()+25)*100));
-                            	} else {
-                            		explosionKey =  (int) (0-(getCraft().getType().getCollisionExplosion()*100));
-                            	}
+                                int explosionKey =  (int) (0-(getCraft().getType().getCollisionExplosion()*100));
                                 if (!getCraft().getW().getBlockAt(oldLoc.getX(),oldLoc.getY(), oldLoc.getZ()).getType().equals(Material.AIR)){
                                     explosionSet.add( new MapUpdateCommand( oldLoc, explosionKey, (byte)0, getCraft() ) );
                                     data.setCollisionExplosion(true);
@@ -639,7 +637,6 @@ public class TranslationTask extends AsyncTask {
                                             fail( String.format( I18nSupport.getInternationalisedString( "Translation - Failed Craft hit height limit" ) ) );
                                         }else{
                                             fail( String.format( I18nSupport.getInternationalisedString( "Translation - Failed Craft is obstructed" )+" @ %d,%d,%d,%s", oldLoc.getX(), oldLoc.getY(), oldLoc.getZ(), getCraft().getW().getBlockAt(newLoc.getX(),newLoc.getY(), newLoc.getZ()).getType().toString()) );
-
                                         }
                                         break;
                                 }
@@ -766,12 +763,16 @@ public class TranslationTask extends AsyncTask {
             data.setUpdates(explosionSet.toArray( new MapUpdateCommand[1] ) );
 
             fail( String.format( I18nSupport.getInternationalisedString( "Translation - Failed Craft is obstructed" ) ) );
-            
-            if(getCraft().getSinking()==true) {
-                if(getCraft().getType().getSinkPercent()!=0.0) {
-                    getCraft().setLastBlockCheck(0);
-                }				
-                getCraft().setLastCruisUpdate(System.currentTimeMillis()-30000);
+            if(craftPilot!=null) {
+	            Location location = craftPilot.getLocation();
+	            String name = craftPilot.getName();
+	            Bukkit.getPlayerExact(name).getWorld().playSound(location,Sound.BLOCK_ANVIL_LAND,1, 0);
+	            if(getCraft().getSinking()==true) {
+	                if(getCraft().getType().getSinkPercent()!=0.0) {
+	                    getCraft().setLastBlockCheck(0);
+	                }				
+	                getCraft().setLastCruisUpdate(System.currentTimeMillis()-30000);
+	            }
             }
         }
 
@@ -801,6 +802,8 @@ public class TranslationTask extends AsyncTask {
                                     if(pTest.getType()==org.bukkit.entity.EntityType.PLAYER) {
                                         Player player=(Player)pTest;
                                         getCraft().getMovedPlayers().put(player, System.currentTimeMillis());
+//                                    } only move players for now, reduce monsters on airships
+//                                   if(pTest.getType()!=org.bukkit.entity.EntityType.DROPPED_ITEM ) {
                                         Location tempLoc = pTest.getLocation();
                                         if(getCraft().getPilotLocked()==true && pTest==CraftManager.getInstance().getPlayerFromCraft(getCraft())) {
                                             tempLoc.setX(getCraft().getPilotLockedX());
@@ -820,14 +823,6 @@ public class TranslationTask extends AsyncTask {
                                             getCraft().setPilotLockedZ(tempLoc.getZ());
                                         }
                                     }
-                                    if(pTest.getType()==org.bukkit.entity.EntityType.PRIMED_TNT) {
-                                    	Entity ent=(Entity)pTest;
-                                    	Location tempLoc = pTest.getLocation();
-                                    	tempLoc=tempLoc.add( data.getDx(), data.getDy(), data.getDz() );
-                                    	EntityUpdateCommand eUp=new EntityUpdateCommand(pTest.getLocation().clone(),tempLoc,pTest);
-                                        entityUpdateSet.add(eUp);
-                                    }
-
                                 }
                             }
 			} else {
@@ -956,16 +951,6 @@ public class TranslationTask extends AsyncTask {
 	private void fail( String message ) {
 		data.setFailed( true );
 		data.setFailMessage( message );
-		Player craftPilot=CraftManager.getInstance().getPlayerFromCraft(getCraft());
-        if(craftPilot!=null) {
-            Location location = craftPilot.getLocation();
-            if(getCraft().getDisabled()==false) {
-            	getCraft().getW().playSound(location,Sound.BLOCK_ANVIL_LAND,1.0f, 0.25f);
-            } else {
-            	getCraft().getW().playSound(location,Sound.ENTITY_IRONGOLEM_DEATH,5.0f, 5.0f);            	
-            }
-        }
-
 	}
 
 	public TranslationTaskData getData() {

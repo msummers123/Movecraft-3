@@ -49,12 +49,10 @@ import com.mewin.WGCustomFlags.WGCustomFlagsPlugin;
 import com.palmergames.bukkit.towny.Towny;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_9_R1.util.CraftMagicNumbers;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.Vector;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.yaml.snakeyaml.Yaml;
@@ -63,15 +61,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -98,14 +92,6 @@ public class Movecraft extends JavaPlugin {
 	public String currentSiegeName=null;
 	public String currentSiegePlayer=null;
 	public long currentSiegeStartTime=0;
-	public HashSet<String> assaultsRunning = new HashSet<String>(); 
-	public HashMap<String, String> assaultStarter = new HashMap<String, String>(); 
-	public HashMap<String, Long> assaultStartTime = new HashMap<String, Long>(); 
-	public HashMap<String, Long> assaultDamages = new HashMap<String, Long>(); 
-	public HashMap<String, World> assaultWorlds = new HashMap<String, World>(); 
-	public HashMap<String, Long> assaultMaxDamages = new HashMap<String, Long>(); 
-	public HashMap<String, com.sk89q.worldedit.Vector> assaultDamagablePartMin = new HashMap<String, com.sk89q.worldedit.Vector>(); 
-	public HashMap<String, com.sk89q.worldedit.Vector> assaultDamagablePartMax = new HashMap<String, com.sk89q.worldedit.Vector>(); 
 	
         @Override
 	public void onDisable() {
@@ -114,31 +100,6 @@ public class Movecraft extends JavaPlugin {
 			StorageChestItem.saveToDisk();
 		shuttingDown = true;
 	}
-        
-    private void disableShadow(int typeID) {
-		Method method;
-		try {
-			net.minecraft.server.v1_9_R1.Block tempBlock=CraftMagicNumbers.getBlock(typeID);
-			method = net.minecraft.server.v1_9_R1.Block.class.getDeclaredMethod("d", int.class);
-			method.setAccessible(true);
-			method.invoke(tempBlock, 0);
-		} catch (NoSuchMethodException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (SecurityException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
 
         @Override
 	public void onEnable() {
@@ -188,21 +149,6 @@ public class Movecraft extends JavaPlugin {
 				Settings.DurabilityOverride.put(Integer.parseInt(str), (Integer)temp.get(str));
 			}
 			
-		}
-		Settings.AssaultEnable = getConfig().getBoolean("AssaultEnable", false);
-		Settings.AssaultDamagesCapPercent = getConfig().getDouble("AssaultDamagesCapPercent", 1.0);
-		Settings.AssaultCooldownHours = getConfig().getInt("AssaultCooldownHours", 24);
-		Settings.AssaultDelay = getConfig().getInt("AssaultDelay", 1800);
-		Settings.AssaultDuration = getConfig().getInt("AssaultDuration", 1800);
-		Settings.AssaultCostPercent = getConfig().getDouble("AssaultCostPercent", 0.25);
-		Settings.AssaultDamagesPerBlock = getConfig().getInt("AssaultDamagesPerBlock", 15);
-		Settings.AssaultRequiredDefendersOnline = getConfig().getInt("AssaultRequiredDefendersOnline", 3);
-		Settings.AssaultDestroyableBlocks = new HashSet<Integer>(getConfig().getIntegerList("AssaultDestroyableBlocks"));
-		Settings.DisableShadowBlocks = new HashSet<Integer>(getConfig().getIntegerList("DisableShadowBlocks"));
-		if(Settings.CompatibilityMode==false) {
-			for(int typ : Settings.DisableShadowBlocks) {
-				disableShadow(typ);
-			}
 		}
 		
 		//load the sieges.yml file
@@ -257,7 +203,6 @@ public class Movecraft extends JavaPlugin {
 		if (wGPlugin == null || !(wGPlugin instanceof WorldGuardPlugin)) {
 			logger.log(Level.INFO, "Movecraft did not find a compatible version of WorldGuard. Disabling WorldGuard integration");
 			Settings.SiegeName=null;
-			Settings.AssaultEnable=false;
 		} else {
 			logger.log(Level.INFO, "Found a compatible version of WorldGuard. Enabling WorldGuard integration");			
 			Settings.WorldGuardBlockMoveOnBuildPerm = getConfig().getBoolean("WorldGuardBlockMoveOnBuildPerm", false);
@@ -270,8 +215,7 @@ public class Movecraft extends JavaPlugin {
 		//load up WorldEdit if it's present
 		Plugin wEPlugin=getServer().getPluginManager().getPlugin("WorldEdit");
 		if (wEPlugin == null || !(wEPlugin instanceof WorldEditPlugin)) {
-			logger.log(Level.INFO, "Movecraft did not find a compatible version of WorldEdit. Disabling WorldEdit integration");
-			Settings.AssaultEnable=false;
+			logger.log(Level.INFO, "Movecraft did not find a compatible version of WorldEdit. Disabling WorldEdit integration");			
 		} else {
 			logger.log(Level.INFO, "Found a compatible version of WorldEdit. Enabling WorldEdit integration");			
 			Settings.RepairTicksPerBlock = getConfig().getInt("RepairTicksPerBlock", 0);
@@ -351,7 +295,6 @@ public class Movecraft extends JavaPlugin {
     			logger.log(Level.INFO, "Could not find compatible Vault plugin. Disabling Vault integration.");			
             	economy = null;
     			Settings.SiegeName=null;
-    			Settings.AssaultEnable=false;
             }
         } else {
 			logger.log(Level.INFO, "Could not find compatible Vault plugin. Disabling Vault integration.");			
@@ -403,8 +346,6 @@ public class Movecraft extends JavaPlugin {
 			this.getCommand("manoverboard").setExecutor(new CommandListener());
 			this.getCommand("contacts").setExecutor(new CommandListener());
 			this.getCommand("siege").setExecutor(new CommandListener());
-			this.getCommand("assaultinfo").setExecutor(new CommandListener());
-			this.getCommand("assault").setExecutor(new CommandListener());
 			
 			getServer().getPluginManager().registerEvents(new BlockListener(),
 					this);

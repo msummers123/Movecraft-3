@@ -30,10 +30,8 @@ import net.countercraft.movecraft.utils.MovecraftLocation;
 import net.countercraft.movecraft.utils.Rotation;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
@@ -57,8 +55,6 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.SignBlock;
 import com.sk89q.worldedit.schematic.SchematicFormat;
 //import com.sk89q.worldedit.world.DataException;
-import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,66 +63,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.UUID;
 
 public class WorldEditInteractListener implements Listener {
 	private static final Map<Player, Long> timeMap = new HashMap<Player, Long>();
 	private static final Map<Player, Long> repairRightClickTimeMap = new HashMap<Player, Long>();
-
-	public boolean repairRegion(World w, String regionName) {
-		if(w==null || regionName==null)
-			return false;
-		String repairStateName=Movecraft.getInstance().getDataFolder().getAbsolutePath() + "/RegionRepairStates";
-		repairStateName+="/";
-		repairStateName+=regionName.replaceAll("\\s+","_");
-		repairStateName+=".schematic";					
-		File file = new File(repairStateName);
-		if( !file.exists() ) {
-			return false;
-		}
-		SchematicFormat sf=SchematicFormat.getFormat(file);
-		CuboidClipboard cc;
-		try {
-			cc = sf.load(file);
-		} catch (com.sk89q.worldedit.data.DataException e) {
-			e.printStackTrace();
-			return false;				
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;				
-		}
-		ArrayList <MapUpdateCommand> updateCommands=new ArrayList <MapUpdateCommand>();
-		int minx=cc.getOrigin().getBlockX();
-		int miny=cc.getOrigin().getBlockY();
-		int minz=cc.getOrigin().getBlockZ();
-		int maxx=minx+cc.getWidth();
-		int maxy=miny+cc.getHeight();
-		int maxz=minz+cc.getLength();
-		for(int x=minx; x<maxx; x++) {
-			for(int y=miny; y<maxy; y++) {
-				for(int z=minz; z<maxz; z++) {
-					Vector ccloc=new Vector(x-minx, y-miny, z-minz);
-					com.sk89q.worldedit.blocks.BaseBlock bb=cc.getBlock(ccloc);
-					if(!bb.isAir()) { // most blocks will be air, quickly move on to the next. This loop will run 16 million times, needs to be fast
-						if(Settings.AssaultDestroyableBlocks.contains(bb.getId()) ) {
-							if(w.getChunkAt(x>>4, z>>4).isLoaded()==false)
-								w.loadChunk(x>>4, z>>4);
-							if(w.getBlockAt(x, y, z).isEmpty() || w.getBlockAt(x, y, z).isLiquid()) {
-								MovecraftLocation moveloc=new MovecraftLocation(x, y, z);
-								MapUpdateCommand updateCom=new MapUpdateCommand(moveloc,bb.getType(),(byte)bb.getData(),bb,null);
-								updateCommands.add(updateCom);
-							}	
-						}
-					}
-				}
-			}
-		}
-		if(!updateCommands.isEmpty()) {
-			MapUpdateManager.getInstance().addWorldUpdate(w,
-					updateCommands.toArray(new MapUpdateCommand[1]), null, null);
-		}
-		return true;
-	}
 
 	@EventHandler
 	public void WEOnPlayerInteract( PlayerInteractEvent event ) {
@@ -178,8 +118,7 @@ public class WorldEditInteractListener implements Listener {
 					}
 					repairStateName+="/";
 					repairStateName+=event.getPlayer().getName();
-					repairStateName+=sign.getLine(1).replaceAll("\\s+","_");
-					repairStateName+=".schematic";					
+					repairStateName+=sign.getLine(1);
 					file = new File(repairStateName);
 					
 					Vector size=new Vector(pCraft.getMaxX()-pCraft.getMinX(),(pCraft.getMaxY()-pCraft.getMinY())+1,pCraft.getMaxZ()-pCraft.getMinZ());
@@ -254,32 +193,12 @@ public class WorldEditInteractListener implements Listener {
 			String repairStateName=Movecraft.getInstance().getDataFolder().getAbsolutePath() + "/RepairStates";
 			repairStateName+="/";
 			repairStateName+=event.getPlayer().getName();
-			repairStateName+=sign.getLine(1).replaceAll("\\s+","_");
+			repairStateName+=sign.getLine(1);
 			File file = new File(repairStateName);
 			if( !file.exists() ) {
-				repairStateName+=".schematic";
-				file = new File(repairStateName);
-				if( !file.exists() ) {
-					repairStateName=Movecraft.getInstance().getDataFolder().getAbsolutePath() + "/RepairStates";
-					repairStateName+="/";
-					repairStateName+=event.getPlayer().getName();
-					repairStateName+=sign.getLine(1).replaceAll("_"," ");
-					file = new File(repairStateName);
-					if( !file.exists() ) {
-						repairStateName+=".schematic";
-						file = new File(repairStateName);
-						if( !file.exists() ) {
-							event.getPlayer().sendMessage( String.format( I18nSupport.getInternationalisedString( "REPAIR STATE NOT FOUND" ) ) );
-							return;
-						}else{
-							event.getPlayer().sendMessage( String.format( I18nSupport.getInternationalisedString( "RESAVE YOUR REPAIR STATE" ) ) );
-						}
-					}else{
-						event.getPlayer().sendMessage( String.format( I18nSupport.getInternationalisedString( "RESAVE YOUR REPAIR STATE" ) ) );
-					}
-				}else{
-					event.getPlayer().sendMessage( String.format( I18nSupport.getInternationalisedString( "RESAVE YOUR REPAIR STATE" ) ) );			}
-				}
+				event.getPlayer().sendMessage( String.format( I18nSupport.getInternationalisedString( "REPAIR STATE NOT FOUND" ) ) );
+				return;
+			}
 			SchematicFormat sf=SchematicFormat.getFormat(file);
 			CuboidClipboard cc;
 			try {
@@ -441,22 +360,6 @@ public class WorldEditInteractListener implements Listener {
 						if(bb.getId()==68 || bb.getId()==63) { // I don't know why this is necessary. I'm pretty sure WE should be loading signs as signblocks, but it doesn't seem to
 							SignBlock sb=new SignBlock(bb.getId(), bb.getData());
 							sb.setNbtData(bb.getNbtData());
-							String []textLines=sb.getText();
-							for(int i=0;i<textLines.length;i++) {
-								String str=textLines[i];
-								if(str.length()>12)
-									str=str.substring(10);
-								str=str.replaceAll("\"","");
-								str=str.replace("\\\\","\\");
-								str=str.replaceAll("\\}","");
-								textLines[i]=str;
-							}
-							if(textLines[0].equals("\\  ||  /")) {
-								textLines[1]="==      ==";
-								textLines[2]="/  ||  \\";
-								textLines[3]="";
-							}
-							sb.setText(textLines);
 							bb=sb;
 						}
 						MovecraftLocation moveloc=new MovecraftLocation(sign.getX()+cc.getOffset().getBlockX()+ccloc.getBlockX(),sign.getY()+cc.getOffset().getBlockY()+ccloc.getBlockY(),sign.getZ()+cc.getOffset().getBlockZ()+ccloc.getBlockZ());
@@ -527,40 +430,6 @@ public class WorldEditInteractListener implements Listener {
 				}
 			}
 		}
-		if(sign.getLine(0).equalsIgnoreCase(ChatColor.RED+"REGION DAMAGED!")) {
-			String regionName=sign.getLine(1).substring(7);
-			Long damages=Long.parseLong(sign.getLine(2).substring(7));
-			String []owners=sign.getLine(3).substring(6).split(",");
-			if(Movecraft.getInstance().getEconomy().has(event.getPlayer(), damages)) {
-				Movecraft.getInstance().getEconomy().withdrawPlayer(event.getPlayer(), damages);
-			} else {
-				event.getPlayer().sendMessage(String.format( I18nSupport.getInternationalisedString( "You do not have enough money" )));
-				return;
-			}
-			event.getPlayer().sendMessage(String.format( I18nSupport.getInternationalisedString( "Repairing region" )));
-			if(repairRegion(event.getClickedBlock().getWorld(), regionName)==false) {
-				Bukkit.getServer().broadcastMessage(String.format("REPAIR OF %s FAILED, CONTACT AN ADMIN",regionName));
-			}
-			ProtectedRegion aRegion=Movecraft.getInstance().getWorldGuardPlugin().getRegionManager(event.getClickedBlock().getWorld()).getRegion(regionName);
-			for(String ownerName : owners) {
-				if(ownerName.length()>16) {
-					aRegion.getOwners().addPlayer(UUID.fromString(ownerName));
-				} else {
-					aRegion.getOwners().addPlayer(ownerName);
-				}
-			}
-			int beaconX=sign.getX()-2;
-			int beaconY=sign.getY()-3;
-			int beaconZ=sign.getZ()-1;
-			for(int x=beaconX; x<beaconX+5; x++) {
-				for(int y=beaconY; y<beaconY+4; y++) {
-					for(int z=beaconZ; z<beaconZ+5; z++) {
-						event.getClickedBlock().getWorld().getBlockAt(x, y, z).setType(Material.AIR);
-					}
-				}
-			}
-
-		}	
 	}
 	
 }

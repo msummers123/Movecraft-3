@@ -41,7 +41,6 @@ public class Craft {
 	private int minX, minZ, maxHeightLimit;
 	private boolean cruising;
 	private boolean sinking;
-	private boolean disabled;
 	private byte cruiseDirection;
 	private long lastCruiseUpdate;
 	private long lastBlockCheck;
@@ -76,9 +75,6 @@ public class Craft {
 		this.cannonDirector=null;
 		this.AADirector=null;
 		this.lastCruiseUpdate=System.currentTimeMillis()-10000;
-		this.cruising=false;
-		this.sinking=false;
-		this.disabled=false;
 	}
 
 	public boolean isNotProcessing() {
@@ -163,7 +159,6 @@ public class Craft {
 		cminZ=cminZ>>4;
 		cmaxX=cmaxX>>4;
 		cmaxZ=cmaxZ>>4;
-		
 		
 		// load all chunks that will be needed to translate this craft
 		for (int posX=cminX-1;posX<=cmaxX+1;posX++) {
@@ -276,17 +271,16 @@ public class Craft {
 		int minY=65535;
 		int maxY=-65535;
 		for (int [][] i1 : hitBox) {
-			if(i1!=null)
-				for (int [] i2 : i1) {
-					if(i2!=null) {
-						if(i2[0]<minY) {
-							minY=i2[0];
-						}
-						if(i2[1]>maxY) {
-							maxY=i2[1];
-						}
+			for (int [] i2 : i1) {
+				if(i2!=null) {
+					if(i2[0]<minY) {
+						minY=i2[0];
+					}
+					if(i2[1]>maxY) {
+						maxY=i2[1];
 					}
 				}
+			}
 		}
 		return maxY;
 	}
@@ -315,10 +309,6 @@ public class Craft {
 		return sinking;
 	}
 	
-	public boolean getDisabled() {
-		return disabled;
-	}
-	
 	public void setCruiseDirection(byte cruiseDirection) {
 		this.cruiseDirection=cruiseDirection;
 	}
@@ -333,10 +323,6 @@ public class Craft {
 
 	public void setSinking(boolean sinking) {
 		this.sinking=sinking;
-	}
-
-	public void setDisabled(boolean disabled) {
-		this.disabled=disabled;
 	}
 
 	public void setLastCruisUpdate(long update) {

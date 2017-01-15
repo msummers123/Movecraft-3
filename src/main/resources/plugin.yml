@@ -1,6 +1,6 @@
 name: Movecraft
 softdepend: [WorldGuard, WorldEdit, Cannons, Vault,Essentials, WGCustomFlags, Towny]
-version: 5.5.0
+version: 5.0.0
 #version: ${env.BUILD_NUMBER}
 description: The original flight and movement plugin for minecraft.
 author: BaccaYarro
@@ -38,11 +38,3 @@ commands:
   siege:
     description: If the region you are standing in is configured for Siege, lays siege to it
     usage: /siege
-  assaultinfo:
-    description: Gives you information about the region(s) you are in, and if they are available for Assault
-    usage: /assaultinfo
-  assault:
-    description: Begins an Assault on the specified region
-    usage: /assault <regionname>
-
-

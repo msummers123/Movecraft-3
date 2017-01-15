@@ -63,7 +63,7 @@ public class CraftType {
 	private float collisionExplosion;
 	private int tickCooldown;
 	private HashMap<ArrayList<Integer>, ArrayList<Double>> flyBlocks = new HashMap<ArrayList<Integer>, ArrayList<Double>>();
-	private HashMap<ArrayList<Integer>, ArrayList<Double>> moveBlocks = new HashMap<ArrayList<Integer>, ArrayList<Double>>();
+	private HashMap<ArrayList<Integer>, Integer> weightBlocks = new HashMap<ArrayList<Integer>, Integer>();
 	private int hoverLimit;
 	private List<Material> harvestBlocks;
         private List<Material> harvesterBladeBlocks;
@@ -130,6 +130,8 @@ public class CraftType {
 	}
 
 	private HashMap<ArrayList<Integer>, ArrayList<Double>> blockIDMapListFromObject(Object obj) {
+		//flyBlocks = ( HashMap<Integer, ArrayList<Double>> ) data.get( "flyblocks" );
+		
 		HashMap<ArrayList<Integer>, ArrayList<Double>> returnMap=new HashMap<ArrayList<Integer>, ArrayList<Double>>();
 		HashMap<Object, Object> objMap=(HashMap<Object, Object>) obj;
 		for(Object i : objMap.keySet()) {
@@ -235,12 +237,6 @@ public class CraftType {
 		}
 
 		flyBlocks = blockIDMapListFromObject(data.get( "flyblocks" ));
-		if(data.containsKey("moveblocks")) {
-			moveBlocks = blockIDMapListFromObject(data.get( "moveblocks" ));			
-		} else {
-			moveBlocks=null;
-		}
-
 		if(data.containsKey("canCruise")) {
 			canCruise=(Boolean) data.get("canCruise");
 		} else {
@@ -617,9 +613,8 @@ public class CraftType {
 	public HashMap<ArrayList<Integer>, ArrayList<Double>> getFlyBlocks() {
 		return flyBlocks;
 	}
-	
-	public HashMap<ArrayList<Integer>, ArrayList<Double>> getMoveBlocks() {
-		return moveBlocks;
+	public HashMap<ArrayList<Integer>, Integer> getWeightBlocks() {
+		return weightBlocks;
 	}
 	
         public int getMaxHeightLimit(){
