@@ -203,7 +203,7 @@ public class CommandListener implements CommandExecutor {
 			if ( pCraft != null ) {
 				new BukkitRunnable() {
 					CraftManager.getInstance().removeCraft( pCraft );
-				}.runTaskLater(Movecraft.getInstance(), Settings.ReleaseDelay);
+				}.runTaskLater(Movecraft.getInstance(), Settings.ReleaseDelay * 20);
 				//e.getPlayer().sendMessage( String.format( I18nSupport.getInternationalisedString( "Player- Craft has been released" ) ) );
 			} else {
 				player.sendMessage( String.format( I18nSupport.getInternationalisedString( "Player- Error - You do not have a craft to release!" ) ) );
