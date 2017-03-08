@@ -201,7 +201,9 @@ public class CommandListener implements CommandExecutor {
 			final Craft pCraft = CraftManager.getInstance().getCraftByPlayerName( player.getName() );
 
 			if ( pCraft != null ) {
-				CraftManager.getInstance().removeCraft( pCraft );
+				new BukkitRunnable() {
+					CraftManager.getInstance().removeCraft( pCraft );
+				}.runTaskLater(Movecraft.getInstance(), Settings.ReleaseDelay);
 				//e.getPlayer().sendMessage( String.format( I18nSupport.getInternationalisedString( "Player- Craft has been released" ) ) );
 			} else {
 				player.sendMessage( String.format( I18nSupport.getInternationalisedString( "Player- Error - You do not have a craft to release!" ) ) );
