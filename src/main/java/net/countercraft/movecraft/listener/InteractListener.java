@@ -528,7 +528,9 @@ public class InteractListener implements Listener {
 		} else if (org.bukkit.ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("Release")) {
 			if (CraftManager.getInstance().getCraftByPlayer(event.getPlayer()) != null) {
 				Craft oldCraft = CraftManager.getInstance().getCraftByPlayer(event.getPlayer());
-				CraftManager.getInstance().removeCraft(oldCraft);
+				new BukkitRunnable() {
+					CraftManager.getInstance().removeCraft(oldCraft);
+				}.runTaskLater(Movecraft.getInstance(), Settings.ReleaseDelay * 20);
 			}
 		} else if (org.bukkit.ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("Move:")) {
 			if (CraftManager.getInstance().getCraftByPlayer(event.getPlayer()) != null) {
