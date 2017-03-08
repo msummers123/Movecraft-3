@@ -181,6 +181,7 @@ public class Movecraft extends JavaPlugin {
 		Settings.RequireCreatePerm = getConfig().getBoolean("RequireCreatePerm", false);
 		Settings.TNTContactExplosives = getConfig().getBoolean("TNTContactExplosives", true);
 		Settings.FadeWrecksAfter = getConfig().getInt("FadeWrecksAfter", 0);
+		Settings.ReleaseDelay = getConfig().getInt("ReleaseDelay", 30);
 		if(getConfig().contains("DurabilityOverride")) {
 			Map<String, Object> temp=(Map<String, Object>)getConfig().getConfigurationSection("DurabilityOverride").getValues(false);
 			Settings.DurabilityOverride=new HashMap<Integer, Integer>();
