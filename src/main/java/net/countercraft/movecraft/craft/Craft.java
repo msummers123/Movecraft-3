@@ -22,6 +22,7 @@ import net.countercraft.movecraft.async.detection.DetectionTask;
 import net.countercraft.movecraft.async.rotation.RotationTask;
 import net.countercraft.movecraft.async.translation.TranslationTask;
 import net.countercraft.movecraft.async.translation.TranslationTaskData;
+import net.countercraft.movecraft.utils.MapUpdateCommand;
 import net.countercraft.movecraft.utils.MovecraftLocation;
 import net.countercraft.movecraft.utils.Rotation;
 
@@ -38,6 +39,7 @@ public class Craft {
 	private int[][][] hitBox;
 	private final CraftType type;
 	private MovecraftLocation[] blockList;
+	private HashMap <MapUpdateCommand , Long> scheduledBlockChanges;
 	private World w;
 	private AtomicBoolean processing = new AtomicBoolean();
 	private int minX, minZ, maxHeightLimit;
@@ -49,7 +51,6 @@ public class Craft {
 	private long lastBlockCheck;
 	private long lastRightClick;
 	private int lastDX, lastDY, lastDZ;
-	private boolean keepMoving;
 	private double burningFuel;
 	private boolean pilotLocked;
 	private double pilotLockedX;
@@ -60,11 +61,15 @@ public class Craft {
 	private Player cannonDirector;
 	private Player AADirector;
 	private HashMap<Player, Long> movedPlayers = new HashMap<Player, Long>(); 
+	private double curSpeed;
+	private int curTickCooldown;
+	private double maxSpeed;
 	
 	public Craft( CraftType type, World world ) {
 		this.type = type;
 		this.w = world;
 		this.blockList = new MovecraftLocation[1];
+		this.scheduledBlockChanges = new HashMap<MapUpdateCommand , Long>();
 		if ( type.getMaxHeightLimit() > w.getMaxHeight() - 1 ) {
 			this.maxHeightLimit = w.getMaxHeight() - 1;
 		} else {
@@ -74,7 +79,6 @@ public class Craft {
 		this.pilotLockedX=0.0;
 		this.pilotLockedY=0.0;
 		this.pilotLockedZ=0.0;
-		this.keepMoving=false;
 		this.cannonDirector=null;
 		this.AADirector=null;
 		this.lastCruiseUpdate=System.currentTimeMillis()-10000;
@@ -118,7 +122,15 @@ public class Craft {
 	public void setHitBox( int[][][] hitBox ) {
 		this.hitBox = hitBox;
 	}
-
+	
+	public HashMap<MapUpdateCommand, Long> getScheduledBlockChanges() {
+		return scheduledBlockChanges;
+	}
+	
+	public void setScheduledBlockChanges(HashMap<MapUpdateCommand, Long> scheduledBlockChanges) {
+		this.scheduledBlockChanges=scheduledBlockChanges;
+	}
+	
 	public void detect( Player player, Player notificationPlayer, MovecraftLocation startPoint ) {
 		AsyncManager.getInstance().submitTask( new DetectionTask( this, startPoint, type.getMinSize(), type.getMaxSize(), type.getAllowedBlocks(), type.getForbiddenBlocks(), type.getForbiddenSignStrings(), player, notificationPlayer, w ), this );
 	}
@@ -365,14 +377,6 @@ public class Craft {
 		return lastRightClick;
 	}
 
-	public void setKeepMoving(boolean keepMoving) {
-		this.keepMoving=keepMoving;
-	}
-	
-	public boolean getKeepMoving() {
-		return keepMoving;
-	}
-	
 	public int getLastDX() {
 		return lastDX;
 	}
@@ -592,4 +596,31 @@ public class Craft {
 		}
 		return null;
 	}
+
+	public void setCurSpeed(double curSpeed) {
+		this.curSpeed=curSpeed;
+		this.curTickCooldown=(int) Math.ceil( 20 / curSpeed ); // always keep the tickcooldown and the speed in sync
+	}
+	
+	public double getCurSpeed() {
+		return curSpeed;
+	}
+	
+	public void setCurTickCooldown(int curTickCooldown) {
+		this.curTickCooldown=curTickCooldown;
+		this.curSpeed=20.0 / curTickCooldown; // always keep the tickcooldown and the speed in sync
+	}
+	
+	public int getCurTickCooldown() {
+		return curTickCooldown;
+	}
+	
+	public void setMaxSpeed(double maxSpeed) {
+		this.maxSpeed=maxSpeed;
+	}
+	
+	public double getMaxSpeed() {
+		return maxSpeed;
+	}
+	
 }
