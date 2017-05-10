@@ -62,6 +62,7 @@ public class Settings {
         public static boolean WGCustomFlagsUseSinkFlag = false;
         public static boolean TownyBlockMoveOnSwitchPerm = false;
         public static boolean TownyBlockSinkOnNoPVP = false;
+	public static int ReleaseDelay = 30;
         public static Map<String, TownyWorldHeightLimits> TownProtectionHeightLimits;
     public static Map<Integer, Integer> DurabilityOverride;
 

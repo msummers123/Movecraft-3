@@ -40,6 +40,7 @@ import net.countercraft.movecraft.utils.Rotation;
 import net.countercraft.movecraft.utils.WGCustomFlagsUtils;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
@@ -201,7 +202,9 @@ public class CommandListener implements CommandExecutor {
 			final Craft pCraft = CraftManager.getInstance().getCraftByPlayerName( player.getName() );
 
 			if ( pCraft != null ) {
-				CraftManager.getInstance().removeCraft( pCraft );
+				new BukkitRunnable() {
+					CraftManager.getInstance().removeCraft( pCraft );
+				}.runTaskLater(Movecraft.getInstance(), Settings.ReleaseDelay * 20);
 				//e.getPlayer().sendMessage( String.format( I18nSupport.getInternationalisedString( "Player- Craft has been released" ) ) );
 			} else {
 				player.sendMessage( String.format( I18nSupport.getInternationalisedString( "Player- Error - You do not have a craft to release!" ) ) );
@@ -850,6 +853,110 @@ public class CommandListener implements CommandExecutor {
 		}
 		
 		return false;
+		
+		
+		if(cmd.getName().equalsIgnoreCase("status")) {
+			if(!player.hasPermission("movecraft.commands") && !player.hasPermission("movecraft.commands.status") {
+				return true;
+			}
+			Craft c = CraftManager.getInstance().getCraftByPlayer(player);
+			if(c != null) {
+				CraftType type = c.getType();
+				HashMap<ArrayList<Integer>, ArrayList<Double>> flyblocksMapRaw = type.getFlyblocks();
+				ArrayList<Integer> flyblockTypes = flyblocksMapRaw.keySet().get(0);
+				ArrayList<Double> flyblockValuesRaw = flyblocksMapRaw.get(flyblockTypes);
+				HashMap<Integer, ArrayList<Double>> flyblocksMap = new HashMap<Integer, ArrayList<Double>>();
+				int currentFlyblockIteration = 0;
+				MovecraftLocation[] mvLocList = c.getBlockList();
+				ArrayList<Material> craftBlockList = new ArrayList<Material>(2000);
+				HashMap<Integer, Integer> flyblockAmounts = new HashMap<Material, Integer>();
+				int size = mvLocList.length();
+				for(MovecraftLocation i : mvLocList) {
+					Location loc = new Location(player.getLocation().getWorld(), i.getX(), i.getY(), i.getZ());
+					Material mat = loc.getBlock().getType();
+					craftBlockList.add(mat);
+				}
+				for(Integer i : flyblockTypes) {
+					ArrayList<Double> flyblockValues = new ArrayList<Double>();
+					flyblockValues.add(flyblockValuesRaw.get(currentFlyblockIteration));
+					flyblockValues.add(flyblockValuesRaw.get(currentFlyblockIteration + 1));
+					currentFlyblockIteration += 2;
+					flyblocksMap.add(i, flyblockValues);
+				}
+				for(Integer i : flyblockTypes) {
+					int amount = 0;
+					for(Material j : craftBlockList) {
+						if(i == j.getId()) {
+							amount++;
+						}
+					}
+					flyblockAmounts.set(i, amount);
+				}
+				for(Integer i : flyblockTypes) {
+					String flyblockName = Material.getMaterial(i).toString() + " (Flyblock)";
+					double min = flyblocksMap.get(i).get(0);
+					double max = flyblocksMap.get(i).get(1);
+					int minAmount = min * size / 100;
+					int maxAmount = max * size / 100;
+					int amount = flyblockAmounts.get(i);
+					double percentage = (amount / size) * 100;
+					player.sendMessage(flyblockName + ":");
+					player.sendMessage("Allowed range: " + min + "% - " + max + "&" + "(" + minAmount + " - " + maxAmount + " blocks)");
+					player.sendMessage("Your ship's percentage: " + percentage + "%" + "(" + amount + " blocks)");
+					player.sendMessage("--------------")
+					player.sendMessage(" ");
+				}
+				player.sendMessage("==================================");
+				player.sendMessage(" ");
+				//flyblocks ^, moveblocks V
+				HashMap<ArrayList<Integer>, ArrayList<Double>> moveblocksMapRaw = type.getMoveblocks();
+				if(moveblocksMapRaw == null) {
+					return true;
+				}
+				ArrayList<Integer> moveblockTypes = moveblocksMapRaw.keySet().get(0);
+				ArrayList<Double> moveblockValuesRaw = moveblocksMapRaw.get(flyblockTypes);
+				HashMap<Integer, ArrayList<Double>> moveblocksMap = new HashMap<Integer, ArrayList<Double>>();
+				int currentMoveblockIteration = 0;
+				HashMap<Integer, Integer> flyblockAmounts = new HashMap<Material, Integer>();
+				for(Integer i : moveblockTypes) {
+					ArrayList<Double> moveblockValues = new ArrayList<Double>();
+					moveblockValues.add(moveblockValuesRaw.get(currentMoveblockIteration));
+					moveblockValues.add(moveblockValuesRaw.get(currentMoveblockIteration + 1));
+					currentMoveblockIteration += 2;
+					moveblocksMap.add(i, moveblockValues);
+				}
+				for(Integer i : moveblockTypes) {
+					int amount = 0;
+					for(Material j : craftBlockList) {
+						if(i == j.getId()) {
+							amount++;
+						}
+					}
+					moveblockAmounts.set(i, amount);
+				}
+				for(Integer i : moveblockTypes) {
+					String moveblockName = Material.getMaterial(i).toString() + " (Moveblock)";
+					double min = moveblocksMap.get(i).get(0);
+					double max = moveblocksMap.get(i).get(1);
+					int minAmount = min * size / 100;
+					int maxAmount = max * size / 100;
+					int amount = moveblockAmounts.get(i);
+					double percentage = (amount / size) * 100;
+					player.sendMessage(moveblockName + ":");
+					player.sendMessage("Allowed range: " + min + "% - " + max + "&" + "(" + minAmount + " - " + maxAmount + " blocks)");
+					if(percentage >= min && percentage <= max) {
+						player.sendMessage("Your ship's percentage: " + ChatColor.GREEN + percentage + "%" + "(" + amount + " blocks)");
+					} else {
+						player.sendMessage("Your ship's percentage: " + ChatColor.RED + percentage + "%" + "(" + amount + " blocks)");
+					}
+					player.sendMessage("--------------")
+					player.sendMessage(" ");
+				}
+			} else {
+				player.sendMessage("You aren't piloting a craft");
+			}
+			return true;
+		}
 	}
 
 	private boolean areDefendersOnline(ProtectedRegion tRegion) {
