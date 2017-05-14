@@ -832,20 +832,28 @@ public class CommandListener implements CommandExecutor, TabCompleter {
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
-		List<String> result = new ArrayList<String>();
+		final List<String> result = new ArrayList<>();
 		if (sender instanceof Player) {
-			Player player = (Player) sender;
-			if (cmd.getName().equalsIgnoreCase("pilot" )) {
+			final Player player = (Player) sender;
+			final String commandName = cmd.getName().toLowerCase();
+			if (commandName.equals("pilot")) {
 				if (args.length < 2) {
 					final String partialName = args.length == 1 ? args[0].toLowerCase() : "";
 					for (CraftType t : CraftManager.getInstance().getCraftTypes()) {
 						final String craftName = t.getCraftName();
 						if (craftName.toLowerCase().startsWith(partialName) &&
-								player.hasPermission("movecraft." + craftName + ".pilot" )) {
+								player.hasPermission("movecraft." + craftName + ".pilot")) {
 							result.add(craftName);
 						}
 					}
 				}
+			} else if (commandName.equals("cruise")) {
+				final String partialDirection = args.length == 1 ? args[0].toLowerCase() : "";
+				if ("east".startsWith(partialDirection)) { result.add("east"); }
+				if ("north".startsWith(partialDirection)) { result.add("north"); }
+				if ("off".startsWith(partialDirection)) { result.add("off"); }
+				if ("south".startsWith(partialDirection)) { result.add("south"); }
+				if ("west".startsWith(partialDirection)) { result.add("west"); }
 			}
 		} else {
 			sender.sendMessage("This command can only be run by a player.");
