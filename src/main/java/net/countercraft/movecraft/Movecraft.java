@@ -400,6 +400,7 @@ public class Movecraft extends JavaPlugin {
 //					new CommandListener(), this);
 			this.getCommand("release").setExecutor(new CommandListener());
 			this.getCommand("pilot").setExecutor(new CommandListener());
+			this.getCommand("pilot").setTabCompleter(new CommandListener());
 			this.getCommand("rotateleft").setExecutor(new CommandListener());
 			this.getCommand("rotateright").setExecutor(new CommandListener());
 			this.getCommand("cruise").setExecutor(new CommandListener());
