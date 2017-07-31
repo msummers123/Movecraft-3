@@ -208,7 +208,8 @@ public class Movecraft extends JavaPlugin {
 				disableShadow(typ);
 			}
 		}
-		
+		Settings.ExchangeDispensersForChests = getConfig().getBoolean("ExchangeDispensersForChests", false);
+
 		//load the sieges.yml file
 		File siegesFile = new File( Movecraft.getInstance().getDataFolder().getAbsolutePath() + "/sieges.yml" );
 		InputStream input=null;
