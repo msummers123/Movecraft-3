@@ -52,7 +52,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_10_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import org.bukkit.plugin.Plugin;
@@ -118,8 +118,8 @@ public class Movecraft extends JavaPlugin {
     private void disableShadow(int typeID) {
 		Method method;
 		try {
-			net.minecraft.server.v1_10_R1.Block tempBlock=CraftMagicNumbers.getBlock(typeID);
-			method = net.minecraft.server.v1_10_R1.Block.class.getDeclaredMethod("d", int.class);
+			net.minecraft.server.v1_12_R1.Block tempBlock=CraftMagicNumbers.getBlock(typeID);
+			method = net.minecraft.server.v1_12_R1.Block.class.getDeclaredMethod("d", int.class);
 			method.setAccessible(true);
 			method.invoke(tempBlock, 0);
 		} catch (NoSuchMethodException e1) {
@@ -162,7 +162,7 @@ public class Movecraft extends JavaPlugin {
 		Settings.CompatibilityMode = getConfig().getBoolean("CompatibilityMode", false);
 		if(Settings.CompatibilityMode==false) {
 			try {
-				 	Class.forName( "net.minecraft.server.v1_10_R1.Chunk" );
+				 	Class.forName( "net.minecraft.server.v1_12_R1.Chunk" );
 				} catch( ClassNotFoundException e ) {
 					Settings.CompatibilityMode=true;
 					logger.log(Level.INFO, "WARNING: CompatibilityMode was set to false, but required build-specific classes were not found. FORCING COMPATIBILITY MODE");
