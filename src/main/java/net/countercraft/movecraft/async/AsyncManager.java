@@ -45,7 +45,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.v1_10_R1.block.CraftBlockState;
+import org.bukkit.craftbukkit.v1_12_R1.block.CraftBlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
