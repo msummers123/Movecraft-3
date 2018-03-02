@@ -757,7 +757,7 @@ public class AsyncManager extends BukkitRunnable {
                                             pcraft.setDisabled(true);
                                             if (pcraft.getNotificationPlayer() != null) {
                                                 Location loc = pcraft.getNotificationPlayer().getLocation();
-                                                pcraft.getW().playSound(loc, Sound.ENTITY_IRONGOLEM_DEATH, 5.0f, 5.0f);
+                                                pcraft.getW().playSound(loc, Sound.IRONGOLEM_DEATH, 5.0f, 5.0f);
                                             }
                                         }
                                     }
@@ -1298,7 +1298,7 @@ public class AsyncManager extends BukkitRunnable {
 
                                         ccraft.getNotificationPlayer().sendMessage(notification);
                                         w.playSound(ccraft.getNotificationPlayer().getLocation(),
-                                                Sound.BLOCK_ANVIL_LAND, 1.0f, 2.0f);
+                                                Sound.ANVIL_LAND, 1.0f, 2.0f);
 /*										final World sw = w; 
 										final Player sp = ccraft.getNotificationPlayer();
 										BukkitTask replaysound = new BukkitRunnable() {

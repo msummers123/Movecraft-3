@@ -665,7 +665,7 @@ public class CommandListener implements CommandExecutor {
             Bukkit.getServer().broadcastMessage(String.format("%s is preparing to assault %s! All players wishing to participate in the defense should head there immediately! Assault will begin in %d minutes"
                     , player.getDisplayName(), args[0], Settings.AssaultDelay / 60));
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1, (float) 0.25);
+                p.playSound(p.getLocation(), Sound.WITHER_DEATH, 1, (float) 0.25);
             }
             final String taskAssaultName = args[0];
             final String taskPlayerDisplayName = player.getDisplayName();
@@ -679,7 +679,7 @@ public class CommandListener implements CommandExecutor {
                     Bukkit.getServer().broadcastMessage(String.format("The Assault of %s has commenced! The assault leader is %s. Destroy the enemy region!"
                             , taskAssaultName, taskPlayerDisplayName));
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1, (float) 0.25);
+                        p.playSound(p.getLocation(), Sound.WITHER_DEATH, 1, (float) 0.25);
                     }
                     Movecraft.getInstance().assaultsRunning.add(taskAssaultName);
                     Movecraft.getInstance().assaultStarter.put(taskAssaultName, taskPlayerName);
@@ -757,7 +757,7 @@ public class CommandListener implements CommandExecutor {
                         Bukkit.getServer().broadcastMessage(String.format("%s is preparing to siege %s! All players wishing to participate in the defense should head there immediately! Siege will begin in %d minutes"
                                 , player.getDisplayName(), foundSiegeName, Settings.SiegeDelay.get(foundSiegeName) / 60));
                         for (Player p : Bukkit.getOnlinePlayers()) {
-                            p.playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1, (float) 0.25);
+                            p.playSound(p.getLocation(), Sound.WITHER_DEATH, 1, (float) 0.25);
                         }
                         final String taskPlayerDisplayName = player.getDisplayName();
                         final String taskPlayerName = player.getName();
@@ -768,7 +768,7 @@ public class CommandListener implements CommandExecutor {
                                 Bukkit.getServer().broadcastMessage(String.format("%s is preparing to siege %s! All players wishing to participate in the defense should head there immediately! Siege will begin in %d minutes"
                                         , taskPlayerDisplayName, taskSiegeName, (Settings.SiegeDelay.get(taskSiegeName) / 60) / 4 * 3));
                                 for (Player p : Bukkit.getOnlinePlayers()) {
-                                    p.playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1, 0);
+                                    p.playSound(p.getLocation(), Sound.WITHER_DEATH, 1, 0);
                                 }
                             }
                         }.runTaskLater(Movecraft.getInstance(), (20 * Settings.SiegeDelay.get(taskSiegeName) / 4 * 1));
@@ -778,7 +778,7 @@ public class CommandListener implements CommandExecutor {
                                 Bukkit.getServer().broadcastMessage(String.format("%s is preparing to siege %s! All players wishing to participate in the defense should head there immediately! Siege will begin in %d minutes"
                                         , taskPlayerDisplayName, taskSiegeName, (Settings.SiegeDelay.get(taskSiegeName) / 60) / 4 * 2));
                                 for (Player p : Bukkit.getOnlinePlayers()) {
-                                    p.playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1, 0);
+                                    p.playSound(p.getLocation(), Sound.WITHER_DEATH, 1, 0);
                                 }
                             }
                         }.runTaskLater(Movecraft.getInstance(), (20 * Settings.SiegeDelay.get(taskSiegeName) / 4 * 2));
@@ -788,7 +788,7 @@ public class CommandListener implements CommandExecutor {
                                 Bukkit.getServer().broadcastMessage(String.format("%s is preparing to siege %s! All players wishing to participate in the defense should head there immediately! Siege will begin in %d minutes"
                                         , taskPlayerDisplayName, taskSiegeName, (Settings.SiegeDelay.get(taskSiegeName) / 60) / 4 * 1));
                                 for (Player p : Bukkit.getOnlinePlayers()) {
-                                    p.playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1, 0);
+                                    p.playSound(p.getLocation(), Sound.WITHER_DEATH, 1, 0);
                                 }
                             }
                         }.runTaskLater(Movecraft.getInstance(), (20 * Settings.SiegeDelay.get(taskSiegeName) / 4 * 3));
@@ -798,7 +798,7 @@ public class CommandListener implements CommandExecutor {
                                 Bukkit.getServer().broadcastMessage(String.format("The Siege of %s has commenced! The siege leader is %s. Destroy the enemy vessels!"
                                         , taskSiegeName, taskPlayerDisplayName, (Settings.SiegeDuration.get(taskSiegeName) / 60)));
                                 for (Player p : Bukkit.getOnlinePlayers()) {
-                                    p.playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1, (float) 0.25);
+                                    p.playSound(p.getLocation(), Sound.WITHER_DEATH, 1, (float) 0.25);
                                 }
                                 Movecraft.getInstance().currentSiegeName = taskSiegeName;
                                 Movecraft.getInstance().currentSiegePlayer = taskPlayerName;

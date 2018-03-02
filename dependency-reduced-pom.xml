@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.countercraft</groupId>
   <artifactId>Movecraft</artifactId>
-  <version>3.0</version>
+  <version>3.0.1</version>
   <ciManagement>
     <system>jenkins</system>
     <url>https://ajcstriker.ci.cloudbees.com/</url>
@@ -24,15 +24,14 @@
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.5.1</version>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>2.1</version>
+        <version>3.1.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -149,28 +148,21 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.bukkit</groupId>
-      <artifactId>bukkit</artifactId>
-      <version>1.10.2-R0.1-SNAPSHOT</version>
+      <groupId>org.spigotmc</groupId>
+      <artifactId>spigot-api</artifactId>
+      <version>1.12.2-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <artifactId>gson</artifactId>
-          <groupId>com.google.code.gson</groupId>
+          <artifactId>bungeecord-chat</artifactId>
+          <groupId>net.md-5</groupId>
         </exclusion>
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.bukkit</groupId>
-      <artifactId>craftbukkit</artifactId>
-      <version>1.10.2-R0.1-SNAPSHOT</version>
-      <scope>system</scope>
-      <systemPath>C:\Users\Mark Summers\git\Movecraft-3/libs/craftbukkit.jar</systemPath>
-    </dependency>
-    <dependency>
       <groupId>net.milkbowl.vault</groupId>
       <artifactId>VaultAPI</artifactId>
-      <version>1.5</version>
+      <version>1.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -180,18 +172,25 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>org.bukkit</groupId>
+      <artifactId>craftbukkit</artifactId>
+      <version>1.12.2-R0.1-SNAPSHOT</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/libs/craftbukkit.jar</systemPath>
+    </dependency>
+    <dependency>
       <groupId>com.palmergames</groupId>
       <artifactId>Towny</artifactId>
       <version>LATEST</version>
       <scope>system</scope>
-      <systemPath>C:\Users\Mark Summers\git\Movecraft-3/libs/Towny.jar</systemPath>
+      <systemPath>${project.basedir}/libs/Towny.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>com.mewin</groupId>
       <artifactId>WGCustomFlags</artifactId>
       <version>LATEST</version>
       <scope>system</scope>
-      <systemPath>C:\Users\Mark Summers\git\Movecraft-3/libs/WGCustomFlags.jar</systemPath>
+      <systemPath>${project.basedir}/libs/WGCustomFlags.jar</systemPath>
     </dependency>
   </dependencies>
   <properties>
