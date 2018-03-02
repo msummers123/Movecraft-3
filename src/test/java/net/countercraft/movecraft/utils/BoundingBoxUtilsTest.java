@@ -21,9 +21,9 @@ import org.testng.annotations.Test;
 
 public class BoundingBoxUtilsTest {
 
-	@Test
-	public void testFormBoundingBox() throws Exception {
-		assert true;
-	}
+    @Test
+    public void testFormBoundingBox() throws Exception {
+        assert true;
+    }
 
 }
